@@ -2,7 +2,7 @@
 
 ## What this is
 A digital business/leadership magazine site. The client is a journalist and
-editor. Her core need: **publish articles herself, with ease, without touching
+editor. Her core need: **publish articles themselves, with ease, without touching
 code.**
 
 Client: JAMIE NONIS
