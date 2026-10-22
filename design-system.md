@@ -15,13 +15,20 @@ here first, then apply it everywhere.
 |---|---|---|
 | `--ink` | `#0F0F0F` | Headlines, body text |
 | `--paper` | `#FFFFFF` | Page background |
-| `--accent` | `#C9A227` | Category tags, links, the one thing that draws the eye |
+| `--accent` | `#8F6436` | Bronze. Category tags, links, rules, buttons, menu highlights |
 | `--muted` | `#6E6E6E` | Bylines, dates, captions, metadata |
 | `--rule` | `#E4E1DA` | Dividers, borders, card edges |
 
-Reasoning: a deep brass-gold rather than The Peak's bright yellow. It reads
-"business authority" rather than "lifestyle magazine", it survives being placed
-next to corporate photography, and it does not look borrowed.
+Reasoning: bronze, per client feedback (Oct 2026: "more bronze"). It reads
+"business authority" rather than "lifestyle magazine" and survives being placed
+next to corporate photography.
+
+**Interim value.** `#8F6436` is a placeholder bronze until the client's deck
+colour scheme and namecard bronze are supplied. Swapping it is a one-line change
+in `styles.css` (`--accent`) — every bronze element on every page follows.
+
+Dark bands (CEO Spotlight) use `--ink` as background and `--paper` / `--rule`
+for text. No new colour values.
 
 Dark mode appears in the client brief but is NOT in the contracted scope.
 Build light mode only.
@@ -83,8 +90,17 @@ photograph.
 
 ## Components
 
-- Article card (image, category tag, headline, byline, date)
-- Hero / featured article block
+- Article card (image, category tag, headline, date — no byline on the homepage)
+- Lead story + secondary stories block (main story with clickable title, three
+  secondary stories beside it; replaces the full-bleed hero)
+- Section menu with drop-down sub-sections (click to open/close; accordion on phones)
+- CEO Spotlight card (portrait, name, role, two or more articles on that CEO)
+- Partner content video block (labelled; links quietly to Partner with us)
+- Photo placeholder (grey block, "Photo n of 5")
+- Instagram embed slot
+- Share bar (WhatsApp, Telegram, Facebook, LinkedIn, X, email, copy link,
+  Add as preferred source on Google)
+- Up next teaser + listicle-style related list
 - Section heading with hairline rule
 - Author byline block
 - Pull quote

@@ -1,14 +1,17 @@
 /* ============================================================
-   The CEO Channel — homepage styles
+   The CEO Channel — site styles (homepage + article page)
    All colour, type and spacing values come from design-system.md.
    Light mode only (dark mode is out of contracted scope).
+
+   TO CHANGE THE BRAND COLOUR: edit --accent below. That is the
+   bronze. Everything bronze on every page follows it.
    ============================================================ */
 
 /* ---------- Design tokens ---------- */
 :root {
   --ink:    #0F0F0F;
   --paper:  #FFFFFF;
-  --accent: #C9A227;
+  --accent: #8F6436;   /* bronze — interim, swap for the deck/namecard value */
   --muted:  #6E6E6E;
   --rule:   #E4E1DA;
 
@@ -28,7 +31,7 @@
 
 /* ---------- Reset ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--paper);
@@ -39,24 +42,16 @@ body {
 }
 img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
+ul { list-style: none; margin: 0; padding: 0; }
 
-/* Any image inside a media container fills it, cropping rather than stretching.
-   The container carries a grey background so a slow image shows as a grey
-   block, never a broken-link icon. */
-.hero__media,
-.card__media,
-.profile__media { background: #F3F2EF; }
-
-.hero__media img,
-.card__media img,
-.profile__media img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-/* Bias the crop upward so faces sit in frame, not cut off at the forehead */
-.card__media img { object-position: center 22%; }
-.profile__media img { object-position: center top; }
+/* Any image inside a media container fills it, cropping rather than
+   stretching. The grey background shows while an image loads. */
+.media { display: block; overflow: hidden; background: #F3F2EF; }
+.media img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+.media--wide   { aspect-ratio: 16 / 9; }
+.media--card   { aspect-ratio: 4 / 3; }
+.media--square { aspect-ratio: 1 / 1; }
+.media--tall   { aspect-ratio: 4 / 5; }
 
 .visually-hidden {
   position: absolute; width: 1px; height: 1px;
@@ -71,9 +66,7 @@ a { color: inherit; text-decoration: none; }
   padding-inline: var(--s-2);
 }
 .section { padding-block: var(--s-4); }
-/* Offset anchor jumps so the sticky nav doesn't cover the heading */
 [id] { scroll-margin-top: 96px; }
-html { scroll-behavior: smooth; }
 
 /* ---------- Typography ---------- */
 h1, h2, h3 {
@@ -82,14 +75,27 @@ h1, h2, h3 {
   margin: 0;
 }
 
+/* Section heading: title left, optional "See all" link right, bronze rule */
+.section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-1);
+  padding-bottom: var(--s-1);
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: var(--s-2);
+}
 .section__heading {
   font-size: 1.5rem;
   line-height: 1.2;
   font-weight: 500;
-  padding-bottom: var(--s-1);
-  border-bottom: 2px solid var(--accent);  /* brass rule under section headings */
-  margin-bottom: var(--s-2);
 }
+.section__more {
+  font-size: 0.8125rem;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.section__more:hover { color: var(--ink); }
 
 /* Category tag — the ONLY all-caps element (per design system) */
 .tag {
@@ -103,14 +109,7 @@ h1, h2, h3 {
   margin: 0 0 var(--s-05);
 }
 
-/* Hero tag gets more presence: solid brass pill, white text */
-.hero__body .tag {
-  color: var(--paper);
-  background: var(--accent);
-  padding: var(--s-025) var(--s-05);
-}
-
-/* Byline / meta */
+/* Date / meta line */
 .meta {
   font-size: 0.8125rem;
   line-height: 1.4;
@@ -118,8 +117,20 @@ h1, h2, h3 {
   margin: var(--s-05) 0 0;
 }
 
+/* Card title and its hover */
+.card__title {
+  font-size: 1.125rem;
+  line-height: 1.3;
+  font-weight: 500;
+}
+.card__title a:hover,
+a.card__title:hover { color: var(--accent); }
+
 /* ============================================================
-   NAVIGATION
+   NAVIGATION — wordmark, section menus with drop-downs, search
+   Each section button opens a panel of sub-sections on click
+   (and closes on a second click). On phones the menus stack and
+   open like an accordion.
    ============================================================ */
 .nav {
   position: sticky;
@@ -139,12 +150,10 @@ h1, h2, h3 {
   gap: var(--s-2);
 }
 
-/* Masthead wordmark — the brand signature. Set in the display face,
-   upper-case and tracked like a magazine masthead. */
 .nav__wordmark {
   font-family: Newsreader, serif;
   font-weight: 600;
-  font-size: 1.15rem;
+  font-size: 1.125rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   white-space: nowrap;
@@ -156,16 +165,47 @@ h1, h2, h3 {
   margin-left: auto;
   font-size: 0.8125rem;
 }
-.nav__links a { color: var(--muted); }
-.nav__links a:hover {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 4px;
-  text-decoration-thickness: 2px;
+
+.menu { position: relative; }
+.menu__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--s-025);
+  background: none;
+  border: 0;
+  padding: var(--s-025) 0;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
 }
-/* Links with no page yet */
-.nav__soon { cursor: help; }
+.menu__btn:hover,
+.menu__btn[aria-expanded="true"] { color: var(--ink); }
+.menu__chev { transition: transform 0.15s; }
+.menu__btn[aria-expanded="true"] .menu__chev { transform: rotate(180deg); color: var(--accent); }
+
+.menu__panel {
+  position: absolute;
+  top: calc(100% + var(--s-1));
+  left: calc(-1 * var(--s-1));
+  min-width: 15rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--accent);
+  padding: var(--s-05) 0;
+  box-shadow: 0 8px 24px rgba(15, 15, 15, 0.08);
+}
+.menu__panel[hidden] { display: none; }
+.menu__panel a {
+  display: block;
+  padding: var(--s-05) var(--s-1);
+  color: var(--ink);
+}
+.menu__panel a:hover { color: var(--accent); background: #FAFAF8; }
+.menu__panel .menu__all {
+  color: var(--accent);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--s-025);
+}
 
 .nav__search {
   background: none;
@@ -194,121 +234,231 @@ h1, h2, h3 {
 }
 
 /* ============================================================
-   AD SLOTS — reserved inventory, not broken images
+   AD SLOTS — reserved inventory placeholders
    ============================================================ */
 .ad {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-inline: auto;
-  background: #F3F2EF;                     /* light grey fill */
+  background: #F3F2EF;
   border: 1px dashed var(--muted);
 }
 .ad__label {
-  font-family: Inter, sans-serif;
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
 }
-
-.ad--leaderboard { width: 970px; max-width: 100%; height: 90px; margin-block: var(--s-2); }
-.ad--halfpage    { width: 300px; height: 600px; border-left: 3px solid var(--accent); }
-.ad--rectangle   { width: 300px; height: 250px; }
+.ad--halfpage  { width: 300px; height: 600px; }
+.ad--rectangle { width: 300px; height: 250px; }
 
 /* ============================================================
-   HERO — full-bleed portrait, headline beneath
+   1. LEAD STORIES (CNA-style) — main story + three secondary
+   Kept short so the next section is visible on first screen.
    ============================================================ */
-.hero__media {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  overflow: hidden;
-}
-.hero__media img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
-
-.hero__body {
-  padding-top: var(--s-2);
-  padding-bottom: var(--s-4);
-}
-.hero__headline {
-  font-size: 3.25rem;
-  line-height: 1.1;
-  max-width: 20ch;
-  margin-top: var(--s-05);
-}
-.hero__body .meta { font-size: 0.8125rem; margin-top: var(--s-1); }
-
-/* ============================================================
-   GRIDS & CARDS
-   ============================================================ */
-.grid { display: grid; gap: var(--s-3) var(--s-2); }
-.grid--3 { grid-template-columns: repeat(3, 1fr); }
-
-.card__media {
-  display: block;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  margin-bottom: var(--s-1);
-}
-.card__media img { width: 100%; height: 100%; object-fit: cover; }
-
-.card__title {
-  font-size: 1.125rem;
-  line-height: 1.3;
-  font-weight: 500;
-}
-.card__title a:hover { color: var(--accent); }
-
-/* ============================================================
-   TWO-COLUMN BAND — Leadership list + sticky Half Page ad
-   ============================================================ */
-.band {
+.lead {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: var(--s-4);
-  align-items: start;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  padding-block: var(--s-15) var(--s-3);
 }
-.list { list-style: none; margin: 0; padding: 0; }
-.list__item {
+.lead__main .media { margin-bottom: var(--s-1); aspect-ratio: 2 / 1; }
+.lead__main .media:hover img { opacity: 0.92; }
+.lead__headline {
+  font-size: 2rem;
+  line-height: 1.15;
+  font-weight: 600;
+  max-width: 34ch;
+}
+.lead__headline a:hover { color: var(--accent); }
+.lead__standfirst {
+  color: var(--muted);
+  max-width: 60ch;
+  margin: var(--s-05) 0 0;
+}
+
+.lead__side {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--rule);
+  padding-left: var(--s-3);
+}
+.lead__side-item {
   padding-block: var(--s-15);
   border-bottom: 1px solid var(--rule);
 }
-.list__item:first-child { padding-top: 0; }
-
-.band__aside { position: sticky; top: 96px; }
+.lead__side-item:first-child { padding-top: 0; }
+.lead__side-item:last-child { border-bottom: 0; }
+.lead__side-item .media { margin-bottom: var(--s-1); }
 
 /* ============================================================
-   CEO PROFILES — horizontal strip of 5 portrait cards
+   2. LATEST INTERVIEWS — 3-column card grid
    ============================================================ */
-.strip {
+.grid { display: grid; gap: var(--s-3) var(--s-2); }
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+.grid--4 { grid-template-columns: repeat(4, 1fr); }
+.card .media { margin-bottom: var(--s-1); }
+
+/* ============================================================
+   3. CEO SPOTLIGHT — dark band, the page's one bold move.
+   Each CEO card lists more than one article on that CEO.
+   ============================================================ */
+.spotlight {
+  background: var(--ink);
+  color: var(--paper);
+}
+.spotlight .section__head { border-bottom-color: var(--accent); }
+.spotlight .section__more { color: var(--rule); }
+.spotlight .section__more:hover { color: var(--paper); }
+.spotlight__intro {
+  color: var(--rule);
+  max-width: 60ch;
+  margin: calc(-1 * var(--s-1)) 0 var(--s-2);
+  font-size: 0.9375rem;
+}
+
+.ceo {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: auto auto 1fr;
+}
+.ceo .media { margin-bottom: var(--s-1); }
+.ceo__name {
+  font-family: Newsreader, serif;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+.ceo__name a:hover { color: var(--accent); }
+.ceo__role { font-size: 0.8125rem; color: var(--rule); margin: var(--s-025) 0 var(--s-1); }
+.ceo__stories li {
+  padding-block: var(--s-05);
+  border-top: 1px solid #2A2A2A;
+  font-family: Newsreader, serif;
+  font-size: 1.0625rem;
+  line-height: 1.3;
+}
+.ceo__stories a:hover { color: var(--accent); }
+.ceo__stories .tag { display: block; margin-bottom: var(--s-025); }
+
+/* ============================================================
+   4. LEADERSHIP — picture-led mosaic (Tatler Homes style):
+   one large feature left, four picture cards right
+   ============================================================ */
+.mosaic {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: var(--s-2);
 }
-.profile__media {
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  margin-bottom: var(--s-1);
+.mosaic__feature .media { margin-bottom: var(--s-1); }
+.mosaic__feature .card__title { font-size: 1.5rem; line-height: 1.2; }
+.mosaic__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-2);
+  align-content: start;
 }
-.profile__media img { width: 100%; height: 100%; object-fit: cover; }
-.profile__name {
-  font-family: Newsreader, serif;
-  font-weight: 500;
-  font-size: 1.125rem;
-  margin: 0;
-}
-.profile:hover .profile__name { color: var(--accent); }
 
 /* ============================================================
-   SIGNATURE SERIES — editorial franchises, text-only cards
+   5. PARTNER CONTENT — labelled branded video
    ============================================================ */
-.series {
-  display: block;
-  padding: var(--s-15);
-  border: 1px solid var(--rule);
+.partner-video {
+  background: #FAFAF8;
+  border-block: 1px solid var(--rule);
 }
-.series:hover { border-color: var(--accent); }
-.series .card__title { margin-bottom: var(--s-05); }
+.partner-video__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  align-items: center;
+}
+.video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.video img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+.video__play {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.video:hover .video__play { background: var(--paper); color: var(--accent); }
+.video__time {
+  position: absolute;
+  right: var(--s-1);
+  bottom: var(--s-1);
+  font-size: 0.75rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: var(--s-025) var(--s-05);
+}
+.partner-video__title { font-size: 1.75rem; line-height: 1.2; font-weight: 500; margin-bottom: var(--s-1); }
+.partner-video p { color: var(--muted); margin: 0 0 var(--s-15); }
+.quiet-link {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+}
+.quiet-link:hover { color: var(--accent); border-color: var(--accent); }
+
+/* Sponsored label — disclosure, deliberately quieter than a tag */
+.sponsored {
+  display: inline-block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--rule);
+  padding: var(--s-025) var(--s-05);
+  margin: 0 0 var(--s-1);
+}
+
+/* ============================================================
+   6. SIGNATURE SERIES — awards-style showcase (Tatler Home
+   Design Awards format): one large tile + picture tiles
+   ============================================================ */
+.showcase {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-2);
+}
+.showcase__tile:first-child { grid-column: span 2; grid-row: span 2; }
+.showcase__tile:first-child .media { aspect-ratio: 4 / 3; }
+.showcase__tile:first-child .card__title { font-size: 1.5rem; }
+.showcase__tile .media { margin-bottom: var(--s-1); }
+.showcase__tile:hover .card__title { color: var(--accent); }
+.showcase__tile .meta { margin-top: var(--s-025); }
+
+/* ============================================================
+   7. INSIGHTS — linear list (thumbnail + text rows) + ad aside
+   ============================================================ */
+.band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--s-4);
+  align-items: start;
+}
+.band__aside { position: sticky; top: 96px; }
+.rows li {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--s-2);
+  padding-block: var(--s-15);
+  border-bottom: 1px solid var(--rule);
+}
+.rows li:first-child { padding-top: 0; }
+.rows__excerpt { color: var(--muted); font-size: 0.9375rem; margin: var(--s-05) 0 0; }
 
 /* ============================================================
    NEWSLETTER
@@ -338,110 +488,62 @@ h1, h2, h3 {
   color: var(--ink);
 }
 .newsletter__form input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+/* Button — solid bronze, white text */
+.btn,
 .newsletter__form button {
+  display: inline-block;
   padding: var(--s-1) var(--s-2);
   font: inherit;
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   background: var(--accent);
-  color: var(--ink);
+  color: var(--paper);
   border: 0;
   cursor: pointer;
 }
-.newsletter__form button:hover { background: var(--ink); color: var(--paper); }
+.btn:hover,
+.newsletter__form button:hover { background: var(--ink); }
 
 /* ============================================================
-   SPONSORED LABEL — same size as a category tag, but in --muted
-   with a hairline box so it reads as disclosure, not a category
+   FOOTER — the only place contact details appear
    ============================================================ */
-.sponsored {
-  display: inline-block;
+.footer {
+  background: var(--ink);
+  color: var(--rule);
+  padding-block: var(--s-4) var(--s-2);
+  font-size: 0.875rem;
+}
+.footer a:hover { color: var(--paper); }
+.footer__top {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: var(--s-2);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid #2A2A2A;
+}
+.footer__wordmark { color: var(--paper); font-size: 1.25rem; display: inline-block; margin-bottom: var(--s-1); }
+.footer__about { margin: 0 0 var(--s-15); max-width: 32ch; }
+.footer__col h2 {
   font-family: Inter, sans-serif;
   font-size: 0.6875rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted);
-  border: 1px solid var(--rule);
-  padding: var(--s-025) var(--s-05);
-  margin: 0 0 var(--s-05);
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: var(--s-1);
 }
-
-/* ============================================================
-   PARTNERSHIPS — teaser band (full page + form ship in Phase 3)
-   ============================================================ */
-.partner {
-  border-block: 1px solid var(--rule);
-  background: #FAFAF8;
-}
-.partner__inner { padding-block: var(--s-4); }
-.partner__headline {
-  font-size: 2.5rem;
-  margin: var(--s-05) 0 var(--s-1);
-  max-width: 16ch;
-}
-.partner__lead {
-  max-width: var(--max-text);
-  margin: 0 0 var(--s-2);
-  color: var(--muted);
-}
-
-/* Ways-to-partner list */
-.partner__list {
-  list-style: none;
-  margin: 0 0 var(--s-2);
-  padding: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--s-15);
-  max-width: 760px;
-}
-.partner__list li {
-  padding-top: var(--s-1);
-  border-top: 2px solid var(--accent);
-}
-.partner__list .card__title { margin-bottom: var(--s-025); }
-
-/* Button — solid brass, ink text (matches the newsletter button) */
-.btn {
-  display: inline-block;
-  padding: var(--s-1) var(--s-2);
-  font-family: Inter, sans-serif;
+.footer__col li { margin-bottom: var(--s-05); }
+.footer__social { display: flex; gap: var(--s-15); }
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-1);
+  padding-top: var(--s-15);
   font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  background: var(--accent);
-  color: var(--ink);
 }
-.btn:hover { background: var(--ink); color: var(--paper); }
-
-/* ============================================================
-   CONTACT — three plain columns of details
-   ============================================================ */
-.contact {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s-2);
-}
-.contact__col p { margin: 0 0 var(--s-05); }
-.contact__col a { border-bottom: 1px solid var(--accent); }
-.contact__col a:hover { color: var(--accent); }
-
-/* ============================================================
-   FOOTER
-   ============================================================ */
-.footer {
-  border-top: 1px solid var(--rule);
-  padding-block: var(--s-4);
-}
-.footer__inner { display: grid; gap: var(--s-15); }
-.footer__wordmark { font-size: 1.25rem; }
-.footer__links { display: flex; flex-wrap: wrap; gap: var(--s-15); font-size: 0.8125rem; }
-.footer__links a { color: var(--muted); }
-.footer__links a:hover { color: var(--ink); }
-.footer__social { display: flex; gap: var(--s-15); color: var(--muted); }
-.footer__social a:hover { color: var(--ink); }
-.footer__copy { margin: 0; }
 
 /* ============================================================
    ARTICLE PAGE
@@ -450,10 +552,8 @@ h1, h2, h3 {
   max-width: 780px;
   margin: var(--s-3) auto var(--s-2);
   padding-inline: var(--s-2);
-  text-align: center;
 }
 .article__head .tag { margin-bottom: var(--s-1); }
-
 .article__headline {
   font-size: 2.5rem;
   line-height: 1.15;
@@ -465,42 +565,106 @@ h1, h2, h3 {
   line-height: 1.5;
   color: var(--muted);
   max-width: 60ch;
-  margin: 0 auto var(--s-2);
+  margin: 0 0 var(--s-2);
 }
-
 .article__byline {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: var(--s-1) var(--s-15);
-  font-size: 0.8125rem;
-  color: var(--muted);
   padding-top: var(--s-15);
   border-top: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  color: var(--muted);
 }
+.article__byline p { margin: 0 0 var(--s-025); }
 .article__byline strong { color: var(--ink); font-weight: 500; }
-.article__share { display: flex; gap: var(--s-1); color: var(--muted); }
-.article__share a:hover { color: var(--accent); }
 
-/* Lead image spans the grid width */
-.article__lead {
-  max-width: var(--max-grid);
-  margin: 0 auto var(--s-3);
-  padding-inline: var(--s-2);
+/* Share bar — CNA style: row of round icon buttons + Google link */
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-05);
+  margin-top: var(--s-1);
 }
-.article__lead img {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
+.share__label { font-size: 0.8125rem; color: var(--muted); margin-right: var(--s-025); }
+.share__btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--rule);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  background: var(--paper);
+  cursor: pointer;
+  padding: 0;
+}
+.share__btn:hover { border-color: var(--accent); color: var(--accent); }
+.share__google {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-05);
+  margin-left: auto;
+  font-size: 0.8125rem;
+  padding: var(--s-05) var(--s-1);
+  border: 1px solid var(--rule);
+  border-radius: 2rem;
+}
+.share__google:hover { border-color: var(--accent); color: var(--accent); }
+.share__copied { font-size: 0.8125rem; color: var(--accent); }
+
+/* Photo placeholders — 5 per article */
+.photo { margin: var(--s-2) 0; }
+.photo__slot {
+  aspect-ratio: 3 / 2;
   background: #F3F2EF;
+  border: 1px dashed var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-05);
+  color: var(--muted);
+  font-size: 0.8125rem;
+  text-align: center;
+  padding: var(--s-1);
 }
+.photo__slot--wide { aspect-ratio: 16 / 9; }
+.photo figcaption,
 .article__lead figcaption {
   font-size: 0.8125rem;
   line-height: 1.4;
   color: var(--muted);
   margin-top: var(--s-05);
 }
+.photo-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-1);
+  margin: var(--s-2) 0;
+}
+.photo-pair .photo { margin: 0; }
+.photo-pair .photo__slot { aspect-ratio: 4 / 5; }
+
+.article__lead {
+  max-width: var(--max-grid);
+  margin: 0 auto var(--s-3);
+  padding-inline: var(--s-2);
+}
+
+/* Instagram embed slot */
+.insta {
+  margin: var(--s-2) 0;
+  max-width: 540px;
+}
+.insta__slot {
+  border: 1px solid var(--rule);
+  padding: var(--s-15);
+  display: grid;
+  gap: var(--s-1);
+  justify-items: start;
+}
+.insta__head { display: flex; align-items: center; gap: var(--s-05); font-size: 0.875rem; font-weight: 500; }
+.insta__img { width: 100%; aspect-ratio: 1 / 1; background: #F3F2EF; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.8125rem; }
 
 /* Body: narrow reading column + sidebar */
 .article__body {
@@ -510,9 +674,7 @@ h1, h2, h3 {
   justify-content: center;
   padding-bottom: var(--s-4);
 }
-.article__main p {
-  margin: 0 0 var(--s-15);
-}
+.article__main > p { margin: 0 0 var(--s-15); }
 .article__main h2 {
   font-size: 1.5rem;
   font-weight: 500;
@@ -528,40 +690,81 @@ h1, h2, h3 {
   padding-left: var(--s-15);
   border-left: 3px solid var(--accent);
 }
-.article__ad { margin: var(--s-2) 0; }
+.article__end {
+  border-top: 1px solid var(--rule);
+  padding-top: var(--s-15);
+  margin-top: var(--s-2);
+}
 
-.article__aside { align-self: start; position: sticky; top: 96px; }
-.article__related { margin-bottom: var(--s-2); }
-.article__related ul { list-style: none; margin: var(--s-1) 0 0; padding: 0; }
-.article__related li { padding-block: var(--s-05); border-bottom: 1px solid var(--rule); font-size: 0.9375rem; }
-.article__related a:hover { color: var(--accent); }
+.article__aside { align-self: start; position: sticky; top: 96px; display: grid; gap: var(--s-2); }
+
+/* Related — numbered listicle list (CNA style) */
+.numbered { counter-reset: n; }
+.numbered li {
+  counter-increment: n;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  padding-block: var(--s-1);
+  border-bottom: 1px solid var(--rule);
+}
+.numbered li::before {
+  content: counter(n);
+  font-family: Newsreader, serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--accent);
+}
+.numbered a { font-family: Newsreader, serif; font-size: 1.0625rem; line-height: 1.3; font-weight: 500; }
+.numbered a:hover { color: var(--accent); }
+
+/* Up next — run-on teaser for the next article */
+.upnext {
+  border-top: 2px solid var(--accent);
+  background: #FAFAF8;
+}
+.upnext__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  align-items: center;
+}
+.upnext__headline { font-size: 2rem; line-height: 1.15; font-weight: 500; margin-bottom: var(--s-1); }
+.upnext__headline a:hover { color: var(--accent); }
+.upnext p { color: var(--muted); margin: 0 0 var(--s-15); }
 
 /* ============================================================
    RESPONSIVE — tablet
    ============================================================ */
 @media (max-width: 1024px) {
+  .nav__links { gap: var(--s-1); }
   .grid--3 { grid-template-columns: repeat(2, 1fr); }
-  .strip { grid-template-columns: repeat(3, 1fr); }
+  .grid--4 { grid-template-columns: repeat(2, 1fr); }
+  .lead { grid-template-columns: 1fr; gap: var(--s-2); }
+  .lead__side { border-left: 0; padding-left: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-2); }
+  .lead__side-item { padding: 0; border: 0; }
+  .lead__headline { font-size: 1.75rem; }
+  .mosaic { grid-template-columns: 1fr; }
+  .showcase { grid-template-columns: repeat(2, 1fr); }
+  .showcase__tile:first-child { grid-row: auto; }
   .band { grid-template-columns: 1fr; }
   .band__aside { position: static; justify-self: center; }
-  .hero__headline { font-size: 2.5rem; }
-  .contact { grid-template-columns: 1fr 1fr; }
+  .partner-video__inner { grid-template-columns: 1fr; gap: var(--s-2); }
+  .footer__top { grid-template-columns: 1fr 1fr; }
 
-  /* Article: drop the sidebar below the text */
   .article__body { grid-template-columns: minmax(0, 680px); }
-  .article__aside { position: static; display: flex; flex-wrap: wrap; gap: var(--s-2); }
-  .article__related { margin-bottom: 0; }
+  .article__aside { position: static; }
+  .upnext__inner { grid-template-columns: 1fr; gap: var(--s-2); }
 }
 
 /* ============================================================
-   RESPONSIVE — mobile: single column, hamburger, mobile ad sizes
+   RESPONSIVE — mobile: single column, hamburger + accordion menu
    ============================================================ */
 @media (max-width: 640px) {
   .wrap { padding-inline: var(--s-1); }
   .nav__inner { padding-inline: var(--s-1); gap: var(--s-1); }
   .section { padding-block: var(--s-3); }
 
-  /* Nav collapses to hamburger */
+  /* Menu collapses under a hamburger; each section opens as an accordion */
   .nav__links {
     display: none;
     position: absolute;
@@ -571,33 +774,50 @@ h1, h2, h3 {
     gap: 0;
     background: var(--paper);
     border-bottom: 1px solid var(--rule);
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
   }
   .nav--open .nav__links { display: flex; }
-  .nav__links a {
+  .menu { border-top: 1px solid var(--rule); }
+  .menu__btn {
+    width: 100%;
+    justify-content: space-between;
     padding: var(--s-1);
-    border-top: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    color: var(--ink);
   }
+  .menu__panel {
+    position: static;
+    border: 0;
+    box-shadow: none;
+    padding: 0 0 var(--s-05);
+    min-width: 0;
+  }
+  .menu__panel a { padding: var(--s-05) var(--s-2); }
   .nav__toggle { display: block; }
   .nav__search { order: 3; }
 
-  /* Ad slots swap to mobile sizes */
-  .ad--leaderboard { width: 320px; height: 50px; }
-  .ad--halfpage,
-  .ad--rectangle { width: 300px; height: 250px; }
+  .grid--3, .grid--4, .mosaic__grid { grid-template-columns: 1fr; }
+  .lead { padding-top: var(--s-1); }
+  .lead__side { grid-template-columns: 1fr; gap: 0; }
+  .lead__side-item { padding-block: var(--s-1); border-bottom: 1px solid var(--rule); }
+  .lead__side-item .media { display: none; }
+  .lead__headline { font-size: 1.5rem; }
+  .lead__main .media { aspect-ratio: 16 / 10; }
+  .showcase { grid-template-columns: 1fr; }
+  .showcase__tile:first-child { grid-column: auto; }
+  .rows li { grid-template-columns: 112px minmax(0, 1fr); gap: var(--s-1); }
+  .rows__excerpt { display: none; }
+  .ad--halfpage { width: 300px; height: 250px; }
+  .footer__top { grid-template-columns: 1fr; }
 
-  /* Single column everywhere */
-  .grid--3 { grid-template-columns: 1fr; }
-  .strip { grid-template-columns: 1fr; }
-  .contact { grid-template-columns: 1fr; }
-
-  .hero__headline { font-size: 2rem; }
-  .partner__headline { font-size: 1.75rem; }
   .article__headline { font-size: 1.75rem; }
-  .article__head { margin-top: var(--s-2); }
+  .article__head { margin-top: var(--s-2); padding-inline: var(--s-1); }
+  .article__lead { padding-inline: 0; }
+  .share__google { margin-left: 0; }
   .pullquote { font-size: 1.25rem; }
+  .upnext__headline { font-size: 1.5rem; }
 
   .newsletter__form { flex-direction: column; }
   .newsletter__form button { width: 100%; }
-
-  .partner__list { grid-template-columns: 1fr; }
 }
