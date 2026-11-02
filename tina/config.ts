@@ -7,6 +7,10 @@
 // for Jamie, not for developers.
 //
 // Matches content-model.md. Change that file first, then this one.
+//
+// No `router` settings on purpose: our pages are plain HTML, so Tina's
+// side-by-side visual preview can't attach to them. Without a router,
+// clicking an item opens the full-screen form, which is what we want.
 // ============================================================
 import { defineConfig } from "tinacms";
 
@@ -81,7 +85,6 @@ export default defineConfig({
         path: "content/articles",
         format: "md",
         ui: {
-          router: ({ document }) => `/articles/${document._sys.filename}/`,
           filename: { slugify: (v: any) => (v?.title || "").toLowerCase().replace(/[’']/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") },
         },
         defaultItem: () => ({ publishedDate: new Date().toISOString(), draft: true }),
@@ -229,7 +232,7 @@ export default defineConfig({
         path: "content/settings",
         format: "json",
         match: { include: "homepage" },
-        ui: { allowedActions: { create: false, delete: false }, router: () => "/" },
+        ui: { allowedActions: { create: false, delete: false } },
         fields: [
           { type: "reference", name: "leadStory", label: "Main story (top left, biggest picture)", collections: ["article"], required: true },
           pickArticles("secondaryStories", "Three stories beside the main story", "Pick exactly three. The first one shows with its picture."),
