@@ -15,7 +15,7 @@ here first, then apply it everywhere.
 |---|---|---|
 | `--ink` | `#0F0F0F` | Headlines, body text |
 | `--paper` | `#FFFFFF` | Page background |
-| `--accent` | `#8F6436` | Bronze. Category tags, links, rules, buttons, menu highlights |
+| `--accent` | `#B46943` | Bronze. Category tags, links, rules, buttons, menu highlights |
 | `--muted` | `#6E6E6E` | Bylines, dates, captions, metadata |
 | `--rule` | `#E4E1DA` | Dividers, borders, card edges |
 
@@ -23,9 +23,12 @@ Reasoning: bronze, per client feedback (Oct 2026: "more bronze"). It reads
 "business authority" rather than "lifestyle magazine" and survives being placed
 next to corporate photography.
 
-**Interim value.** `#8F6436` is a placeholder bronze until the client's deck
-colour scheme and namecard bronze are supplied. Swapping it is a one-line change
-in `styles.css` (`--accent`) — every bronze element on every page follows.
+**Confirmed value.** `#B46943` supplied by the client (Nov 2026), replacing the
+interim `#8F6436`. It lives in one place, `styles.css` (`--accent`), and every
+bronze element on every page follows it.
+
+Contrast: 4.2:1 on white. Fine for headings, rules, buttons and large text;
+for small text keep it at weight 500+ (category tags already are).
 
 Dark bands (CEO Spotlight) use `--ink` as background and `--paper` / `--rule`
 for text. No new colour values.
