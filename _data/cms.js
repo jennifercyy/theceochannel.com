@@ -121,7 +121,11 @@ module.exports = function () {
     .filter((a) => a.draft !== true)
     .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
 
+  // Tina may save dates with or without quotes; make them all the same
+  const iso = (d) => (d ? new Date(d).toISOString() : "");
   for (const a of articles) {
+    a.publishedDate = iso(a.publishedDate);
+    a.updatedDate = iso(a.updatedDate);
     a.url = `/articles/${a.slug}/`;
     a.cat = categories[a.category] || { name: "", url: "/" };
     a.topCat = topOf(a.cat);
