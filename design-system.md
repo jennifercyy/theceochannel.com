@@ -18,6 +18,7 @@ here first, then apply it everywhere.
 | `--accent` | `#B46943` | Bronze. Category tags, links, rules, buttons, menu highlights |
 | `--muted` | `#6E6E6E` | Bylines, dates, captions, metadata |
 | `--rule` | `#E4E1DA` | Dividers, borders, card edges |
+| `--wash` | `#F3F2EF` | Light grey panel: feature band, image placeholders while loading |
 
 Reasoning: bronze, per client feedback (Oct 2026: "more bronze"). It reads
 "business authority" rather than "lifestyle magazine" and survives being placed
@@ -94,6 +95,11 @@ photograph.
 ## Components
 
 - Article card (image, category tag, headline, date — no byline on the homepage)
+- Picture section (Tatler Homes photo placement): tall picture + standfirst left;
+  wide picture top right; two small pictures side by side below; centred
+  "More … →" link under a hairline
+- Feature band (Tatler Homes Design Awards placement): `--wash` panel,
+  heading + short bronze bar + description left, three picture rows right
 - Lead story + secondary stories block (main story with clickable title, three
   secondary stories beside it; replaces the full-bleed hero)
 - Section menu with drop-down sub-sections (click to open/close; accordion on phones)

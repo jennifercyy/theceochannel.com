@@ -14,6 +14,7 @@
   --accent: #B46943;   /* bronze — client-confirmed, Nov 2026 */
   --muted:  #6E6E6E;
   --rule:   #E4E1DA;
+  --wash:   #F3F2EF;   /* light grey: feature band, image placeholders */
 
   /* Spacing scale (rem): 0.25 · 0.5 · 1 · 1.5 · 2 · 3 · 4 · 6 */
   --s-025: 0.25rem;
@@ -46,7 +47,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 /* Any image inside a media container fills it, cropping rather than
    stretching. The grey background shows while an image loads. */
-.media { display: block; overflow: hidden; background: #F3F2EF; }
+.media { display: block; overflow: hidden; background: var(--wash); }
 .media img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
 .media--wide   { aspect-ratio: 16 / 9; }
 .media--card   { aspect-ratio: 4 / 3; }
@@ -241,7 +242,7 @@ a.card__title:hover { color: var(--accent); }
   align-items: center;
   justify-content: center;
   margin-inline: auto;
-  background: #F3F2EF;
+  background: var(--wash);
   border: 1px dashed var(--muted);
 }
 .ad__label {
@@ -359,6 +360,65 @@ a.card__title:hover { color: var(--accent); }
   align-content: start;
 }
 
+
+/* ============================================================
+   PICTURE SECTION — Tatler Homes photo placement:
+   one tall picture left (with standfirst); right column has one
+   wide picture on top and two small pictures side by side below.
+   ============================================================ */
+.tatler {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-2);
+  align-items: start;
+}
+.tatler .media { margin-bottom: var(--s-1); }
+.tatler__title { font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: 1.5rem; line-height: 1.2; margin: var(--s-05) 0; }
+.tatler__title a:hover { color: var(--accent); }
+.tatler__excerpt { color: var(--muted); font-size: 0.9375rem; margin: 0; }
+.tatler__side { display: grid; gap: var(--s-2); }
+.tatler__pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-15); }
+.tatler__small-title { font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: 1.0625rem; line-height: 1.3; margin: var(--s-025) 0 0; }
+.tatler__small-title a:hover { color: var(--accent); }
+
+/* Centred "More … →" link under a hairline, as on Tatler */
+.more-link {
+  display: block;
+  margin-top: var(--s-3);
+  padding-top: var(--s-1);
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.more-link:hover { color: var(--accent); }
+.more-link--left { margin-top: var(--s-15); padding-top: 0; border-top: 0; text-align: left; }
+
+/* ============================================================
+   FEATURE BAND — grey panel (Tatler Homes Design Awards placement):
+   heading + short bronze bar + description left, three picture rows right
+   ============================================================ */
+.feature-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-3);
+  background: var(--wash);
+  padding: var(--s-3);
+}
+.feature-band__heading { font-family: Newsreader, Georgia, serif; font-weight: 500; font-size: 1.5rem; line-height: 1.2; margin: 0; }
+.feature-band__bar { display: block; width: var(--s-3); height: var(--s-05); background: var(--accent); margin: var(--s-15) 0; }
+.feature-band__intro p { color: var(--muted); font-size: 0.9375rem; margin: 0; }
+.feature-band__list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-15); }
+.feature-band__list li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--s-1); align-items: start; }
+.feature-band__list .media { aspect-ratio: 1 / 1; }
+
+/* Real photos inside articles (the editor fills these) */
+.photo img, .article__lead img { display: block; width: 100%; height: auto; }
+.photo-pair .photo img { aspect-ratio: 4 / 5; object-fit: cover; }
+a.menu__btn { text-decoration: none; }
+
 /* ============================================================
    5. PARTNER CONTENT — labelled branded video
    ============================================================ */
@@ -423,22 +483,6 @@ a.card__title:hover { color: var(--accent); }
   padding: var(--s-025) var(--s-05);
   margin: 0 0 var(--s-1);
 }
-
-/* ============================================================
-   6. SIGNATURE SERIES — awards-style showcase (Tatler Home
-   Design Awards format): one large tile + picture tiles
-   ============================================================ */
-.showcase {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--s-2);
-}
-.showcase__tile:first-child { grid-column: span 2; grid-row: span 2; }
-.showcase__tile:first-child .media { aspect-ratio: 4 / 3; }
-.showcase__tile:first-child .card__title { font-size: 1.5rem; }
-.showcase__tile .media { margin-bottom: var(--s-1); }
-.showcase__tile:hover .card__title { color: var(--accent); }
-.showcase__tile .meta { margin-top: var(--s-025); }
 
 /* ============================================================
    7. INSIGHTS — linear list (thumbnail + text rows) + ad aside
@@ -616,7 +660,7 @@ a.card__title:hover { color: var(--accent); }
 .photo { margin: var(--s-2) 0; }
 .photo__slot {
   aspect-ratio: 3 / 2;
-  background: #F3F2EF;
+  background: var(--wash);
   border: 1px dashed var(--muted);
   display: flex;
   flex-direction: column;
@@ -664,7 +708,7 @@ a.card__title:hover { color: var(--accent); }
   justify-items: start;
 }
 .insta__head { display: flex; align-items: center; gap: var(--s-05); font-size: 0.875rem; font-weight: 500; }
-.insta__img { width: 100%; aspect-ratio: 1 / 1; background: #F3F2EF; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.8125rem; }
+.insta__img { width: 100%; aspect-ratio: 1 / 1; background: var(--wash); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.8125rem; }
 
 /* Body: narrow reading column + sidebar */
 .article__body {
@@ -744,8 +788,7 @@ a.card__title:hover { color: var(--accent); }
   .lead__side-item { padding: 0; border: 0; }
   .lead__headline { font-size: 1.75rem; }
   .mosaic { grid-template-columns: 1fr; }
-  .showcase { grid-template-columns: repeat(2, 1fr); }
-  .showcase__tile:first-child { grid-row: auto; }
+  .feature-band { grid-template-columns: 1fr; gap: var(--s-2); padding: var(--s-2); }
   .band { grid-template-columns: 1fr; }
   .band__aside { position: static; justify-self: center; }
   .partner-video__inner { grid-template-columns: 1fr; gap: var(--s-2); }
@@ -798,14 +841,14 @@ a.card__title:hover { color: var(--accent); }
   .nav__search { order: 3; }
 
   .grid--3, .grid--4, .mosaic__grid { grid-template-columns: 1fr; }
+  .tatler { grid-template-columns: 1fr; }
+  .feature-band { padding: var(--s-15); }
   .lead { padding-top: var(--s-1); }
   .lead__side { grid-template-columns: 1fr; gap: 0; }
   .lead__side-item { padding-block: var(--s-1); border-bottom: 1px solid var(--rule); }
   .lead__side-item .media { display: none; }
   .lead__headline { font-size: 1.5rem; }
   .lead__main .media { aspect-ratio: 16 / 10; }
-  .showcase { grid-template-columns: 1fr; }
-  .showcase__tile:first-child { grid-column: auto; }
   .rows li { grid-template-columns: 112px minmax(0, 1fr); gap: var(--s-1); }
   .rows__excerpt { display: none; }
   .ad--halfpage { width: 300px; height: 250px; }

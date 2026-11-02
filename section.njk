@@ -1,0 +1,36 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: cms.sections
+  size: 1
+  alias: sec
+permalink: "/section/{{ sec.slug }}/index.html"
+eleventyComputed:
+  pageTitle: "{{ sec.name }} — The CEO Channel"
+  pageDescription: "{{ sec.description or (sec.name + ' from The CEO Channel') }}"
+---
+{#
+  SECTION PAGE — one for every section and sub-section in the menu
+  (e.g. /section/leadership/). Lists its stories, newest first.
+#}
+    <section class="wrap section">
+      <div class="section__head">
+        <h1 class="section__heading">{{ sec.name }}</h1>
+      </div>
+      {% if sec.description %}<p class="spotlight__intro">{{ sec.description }}</p>{% endif %}
+
+      {% if sec.items.length %}
+      <div class="grid grid--3">
+        {% for a in sec.items %}
+        <article class="card">
+          <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="800" height="600" alt="" referrerpolicy="no-referrer" /></a>
+          <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
+          <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
+          <p class="meta">{{ a.date }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="meta">No stories here yet.</p>
+      {% endif %}
+    </section>

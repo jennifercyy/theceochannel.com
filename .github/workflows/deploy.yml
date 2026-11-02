@@ -1,0 +1,63 @@
+# ============================================================
+# Publishes the website every time something is saved.
+#
+# When Jamie presses Save in the editor, Tina saves the change to
+# this repo. That triggers this file, which rebuilds the site and
+# puts it live on GitHub Pages — about 2 minutes, start to finish.
+#
+# Needs two secrets in GitHub (Settings → Secrets and variables →
+# Actions): TINA_CLIENT_ID and TINA_TOKEN. See HOW-TO-PUBLISH.md.
+# ============================================================
+name: Publish website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # adds a "Run workflow" button on the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # Preview link lives under /theceochannel.com/. When the real
+  # domain is connected, change both of these to "/" and "".
+  PATH_PREFIX: /theceochannel.com/
+  TINA_BASE_PATH: theceochannel.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build the editor (/admin)
+        run: npx tinacms build
+        env:
+          TINA_CLIENT_ID: ${{ secrets.TINA_CLIENT_ID }}
+          TINA_TOKEN: ${{ secrets.TINA_TOKEN }}
+          GITHUB_BRANCH: main
+      - name: Build the website pages
+        run: npx eleventy
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

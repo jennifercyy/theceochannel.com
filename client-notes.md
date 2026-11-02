@@ -5,6 +5,30 @@ Newest first. Jamie Nonis uses they/them.
 
 ---
 
+## 2 Nov 2026 (afternoon) — editing system, first version
+
+Decisions
+- "Tatler Home awards" reference meant **photo placement**, not the awards
+  format. Applied as two layouts: the picture section (tall + wide + two small)
+  and the grey feature band (heading left, three picture rows right).
+- Jamie does not want **Signature series** — removed from site, menu and editor.
+- Other sections and tabs Jamie may not want can be **switched off in the
+  editor** (Homepage → Show switches; Sections & menu → Show in the menu).
+  Waiting on Jamie's list of which to switch off.
+- Ad uploading raised — **out of scope** (CLAUDE.md). Not built; to be quoted
+  as an add-on if wanted.
+
+Built on branch `cms` (preview link unchanged until merged)
+- Tina editor with Articles, CEOs, Sections & menu, Writers, Videos,
+  Homepage, Footer & contact. Each photo box states position and size.
+- Pages built from /content by Eleventy; auto-publish via GitHub Actions.
+- HOW-TO-PUBLISH.md: photo map for Jamie + one-time Tina Cloud setup.
+
+Still to build: About, Partner with us page + form, CEO and Brand profile
+pages, GA4, newsletter hook-up.
+
+---
+
 ## 2 Nov 2026 — deadline and colour confirmed
 
 Decisions
