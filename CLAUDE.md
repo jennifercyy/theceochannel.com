@@ -47,8 +47,8 @@ is the main financial risk.
 
 ## Phases
 1. Foundation — repo, design system, homepage, domain. **INVOICED & PAID.**
-2. Core pages + Tina CMS working for the client
-3. Conversion page, form, GA4, newsletter, SEO, QA, launch
+2. Core pages + Tina CMS working for the client. **Due 7 Nov 2026.**
+3. Conversion page, form, GA4, newsletter, SEO, QA, launch. **Due 7 Nov 2026.** Balance invoice INV-2026-002 (SGD 2,000) issued 2 Nov.
 
 ## Working rules
 - Read `design-system.md` before writing any CSS. Never introduce a colour,
