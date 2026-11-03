@@ -117,6 +117,10 @@ export default defineConfig({
             description: "Leave ON while writing. To preview: press Save, wait 2 minutes, then open theceochannel.com/preview/ followed by the name shown at the top of this page (e.g. /preview/my-headline/). Turn OFF and Save to publish.",
           },
 
+          {
+            type: "boolean", name: "featured", label: "Feature at the top of the homepage",
+            description: "Tick to put this story in the top area of the homepage. The newest ticked story becomes the main story; the next three sit beside it. If fewer than four are ticked, the picks on the Homepage screen fill the gaps.",
+          },
           { type: "reference", name: "category", label: "Section", description: "The article's main section. It shows as the label above the headline.", collections: ["category"], required: true },
           {
             type: "object", name: "alsoIn", label: "Also show in these homepage sections (optional)", list: true,
@@ -267,10 +271,10 @@ export default defineConfig({
         match: { include: "homepage" },
         ui: { allowedActions: { create: false, delete: false } },
         fields: [
-          { type: "reference", name: "leadStory", label: "Main story (top left, biggest picture)", collections: ["article"], required: true },
+          { type: "reference", name: "leadStory", label: "Main story (used when no article has “Feature at the top of the homepage” ticked)", description: "Ticking “Feature at the top of the homepage” on an article overrides this.", collections: ["article"] },
           {
-            type: "object", name: "secondaryStories", label: "Three stories beside the main story", list: true,
-            description: "Pick exactly three. The first one shows with its picture.",
+            type: "object", name: "secondaryStories", label: "Three stories beside the main story (fill-ins)", list: true,
+            description: "Used to fill any of the three places not taken by ticked “Feature” articles.",
             ui: { itemProps: (item: any) => ({ label: item?.article ? item.article.split("/").pop().replace(".md", "") : "Choose an article" }) },
             fields: [{ type: "reference", name: "article", label: "Article", collections: ["article"] }],
           },

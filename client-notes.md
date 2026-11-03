@@ -5,6 +5,25 @@ Newest first. Jamie Nonis uses they/them.
 
 ---
 
+## 3 Nov 2026 (late afternoon) — homepage top, menu, magazine style, privacy
+
+Built
+- Homepage top: full-width picture; headline left, the three other top stories
+  stacked on the right underneath.
+- "Feature at the top of the homepage" tick on articles (newest ticked = main
+  story; Homepage screen picks fill gaps).
+- Menu items jump to the section on the homepage; "More" and keyword chips
+  open the listing pages. New keyword pages at /keyword/<name>/.
+- Article magazine cues from GQ Singapore's article page: drop cap, single
+  photos wider than the text column, larger serif sub-headings, linked
+  keyword chips. (GQ's homepage couldn't be read from here — screenshots
+  welcome.)
+- Privacy policy at /privacy/ — original text written for this site's actual
+  data use and the PDPA. GQ's policy not copied (copyright, and it describes
+  Condé Nast's systems). [Bracketed] details to fill; review before launch.
+
+---
+
 ## 3 Nov 2026 (afternoon) — lead story, C-Suite profiles, photo positions
 
 Built

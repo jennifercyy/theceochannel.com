@@ -88,7 +88,7 @@ eleventyComputed:
       <!-- BODY — one centred reading column; photos 2–7, pull quote,
            Instagram and a newsletter box slotted in -->
       <div class="article__body wrap">
-        <div class="article__main">
+        <div class="article__main article__main--magazine">
           {% for part in a.parts %}
             {% if part.type == "html" %}{{ part.html | safe }}
             {% elif part.type == "photo" %}{{ figure(part.photo) }}
@@ -108,11 +108,11 @@ eleventyComputed:
             {% endif %}
           {% endfor %}
 
-          <!-- KEYWORDS — the article's keywords from the editor -->
+          <!-- KEYWORDS — each opens a page of every story with that keyword -->
           {% if a.keywords.length %}
           <div class="keywords" data-pagefind-ignore>
             <span class="keywords__label">Keywords</span>
-            {% for k in a.keywords %}<span class="keywords__item">{{ k }}</span>{% endfor %}
+            {% for k in a.keywordLinks %}<a class="keywords__item" href="{{ k.url }}">{{ k.name }}</a>{% endfor %}
           </div>
           {% endif %}
 

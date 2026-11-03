@@ -203,7 +203,7 @@ module.exports = function () {
         const cat = categories[s.category];
         const layout = s.layout || "grid";
         return {
-          type: "stories", layout, heading: s.heading || (cat && cat.name) || "",
+          type: "stories", layout, slug: cat && cat.slug, heading: s.heading || (cat && cat.name) || "",
           description: cat && cat.description, moreUrl: cat && cat.url,
           items: inSection(s.category).slice(0, COUNT[layout] || 3).map(summary),
         };
@@ -213,7 +213,7 @@ module.exports = function () {
         const cat = categories[s.category];
         const theirs = new Set(who ? who.stories.map((x) => x.url) : []);
         return {
-          type: "csuite", heading: s.heading || (cat && cat.name) || "C-Suites", person: who,
+          type: "csuite", slug: cat && cat.slug, heading: s.heading || (cat && cat.name) || "C-Suites", person: who,
           moreUrl: cat && cat.url,
           items: (s.category ? inSection(s.category) : articles).map(summary).filter((x) => !theirs.has(x.url)).slice(0, 3),
         };
@@ -226,11 +226,33 @@ module.exports = function () {
     })
     .filter((s) => s && (s.type !== "stories" || s.items.length) && (s.type !== "spotlight" || s.items.length) && (s.type !== "csuite" || s.person) && (s.type !== "video" || s.item));
 
+  // Top of the homepage: ticked "Feature" articles first (newest first),
+  // then the picks on the Homepage screen fill any gaps.
+  const top = [];
+  const add = (a) => { if (a && !top.includes(a)) top.push(a); };
+  articles.filter((a) => a.featured === true).forEach(add);
+  add(byKey[h.leadStory]);
+  (h.secondaryStories || []).forEach((x) => add(byKey[x.article]));
   const home = {
-    lead: summary(byKey[h.leadStory]),
-    secondary: (h.secondaryStories || []).map((x) => summary(byKey[x.article])).filter(Boolean).slice(0, 3),
+    lead: summary(top[0]),
+    secondary: top.slice(1, 4).map(summary),
     sections,
   };
+
+  // Menu: jump to the section on the homepage when it's there,
+  // otherwise open the section's own page.
+  const onHome = new Set(sections.map((s) => s.slug).filter(Boolean));
+  for (const m of menu) m.url = onHome.has(m.slug) ? `/#${m.slug}` : m.url;
+
+  // Keyword pages (/keyword/<name>/)
+  const slugify = (t) => String(t).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const kw = {};
+  for (const a of articles) for (const k of a.keywords) {
+    const slug = slugify(k);
+    (kw[slug] = kw[slug] || { name: k, slug, url: `/keyword/${slug}/`, items: [] }).items.push(summary(a));
+  }
+  for (const a of everything) a.keywordLinks = a.keywords.map((k) => ({ name: k, url: `/keyword/${slugify(k)}/` }));
+  const keywords = Object.values(kw);
 
   // ---------- Section pages ----------
   const sectionPages = Object.values(categories).map((c) => ({
@@ -238,5 +260,5 @@ module.exports = function () {
     items: inSection(c.key).map(summary),
   }));
 
-  return { articles, everything, menu, sections: sectionPages, profiles, home, site, formatDate };
+  return { articles, everything, menu, sections: sectionPages, profiles, keywords, home, site, formatDate };
 };

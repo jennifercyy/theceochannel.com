@@ -18,7 +18,8 @@ After you press **Save**, the website updates by itself in about 2 minutes.
 4. Optional: **Also show in these homepage sections** puts the story in more
    than one section (e.g. Interviews *and* Leadership).
 5. Add photos (see the photo map below), then the **Article text**.
-6. Add a few **Keywords** — they show under the article.
+6. Add a few **Keywords** — they show under the article, and each one opens a
+   page of every story with that keyword.
 7. **Preview:** press Save, wait about 2 minutes, then open
    `theceochannel.com/preview/` + the article's name (shown at the top of the
    form, e.g. `/preview/my-headline/`). A bronze bar says it's a preview.
@@ -57,7 +58,10 @@ there's no room for goes at the end, in order.
 
 Click **Homepage**:
 
-- **Main story** and **Three stories beside the main story** — pick them.
+- **Top of the homepage:** tick **Feature at the top of the homepage** on an
+  article. The newest ticked story becomes the main story (full-width
+  picture); the next three sit on the right under it. If fewer than four are
+  ticked, the picks on the Homepage screen fill the gaps.
 - **Sections, top to bottom** — drag the ⠿ handle to move a section up or
   down. Open a section to change its heading, which section it takes stories
   from, its **Layout** (Grid, Pictures, Grey band, List), or to switch it off.
@@ -78,6 +82,9 @@ full profile, links, and every story that mentions them, newest first.
   (C-Suite feature) → **Person to feature on the left**.
 
 ## Menu bar
+
+Clicking a menu item jumps to that section on the homepage. **More** (and the
+keyword chips under articles) open the full list of stories.
 
 **Sections & menu** → open a section → **Show in the menu bar** on/off, and
 **Position in the menu** for the order.

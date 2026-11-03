@@ -22,26 +22,31 @@ permalink: /index.html
       </div>
 {% endmacro %}
 
-    <!-- LEAD STORY — full-width picture, then three more stories in a row below -->
+    <!-- LEAD STORY — full-width picture; under it, the headline on the
+         left and the three other top stories stacked on the right -->
     {% if h.lead %}
     <section class="wrap lead">
-      <article class="lead__main">
-        {{ pic(h.lead, "wide", 1600, 686) }}
-        {{ label(h.lead) }}
-        <h1 class="lead__headline"><a href="{{ h.lead.url }}">{{ h.lead.title }}</a></h1>
-        <p class="lead__standfirst">{{ h.lead.excerpt }}</p>
-      </article>
-      {% if h.secondary.length %}
-      <div class="lead__side">
-        {% for a in h.secondary %}
-        <article class="lead__side-item">
-          {{ pic(a, "wide", 700, 394) }}
-          {{ label(a) }}
-          <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
+      {{ pic(h.lead, "wide", 1600, 686) }}
+      <div class="lead__row">
+        <article class="lead__main">
+          {{ label(h.lead) }}
+          <h1 class="lead__headline"><a href="{{ h.lead.url }}">{{ h.lead.title }}</a></h1>
+          <p class="lead__standfirst">{{ h.lead.excerpt }}</p>
         </article>
-        {% endfor %}
+        {% if h.secondary.length %}
+        <div class="lead__side">
+          {% for a in h.secondary %}
+          <article class="lead__side-item">
+            {{ pic(a, "card", 240, 180) }}
+            <div>
+              {{ label(a) }}
+              <h2 class="lead__side-title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
     </section>
     {% endif %}
 
@@ -49,7 +54,7 @@ permalink: /index.html
 
   {% if sec.type == "stories" and sec.layout == "grid" %}
     <!-- GRID — three cards in a row -->
-    <section class="wrap section">
+    <section class="wrap section" {% if sec.slug %}id="{{ sec.slug }}"{% endif %}>
       {{ head(sec) }}
       <div class="grid grid--3">
         {% for a in sec.items %}
@@ -66,7 +71,7 @@ permalink: /index.html
   {% elif sec.type == "stories" and sec.layout == "pictures" %}
     <!-- PICTURES — Tatler Homes photo placement:
          one tall picture left; one wide + two small right -->
-    <section class="wrap section">
+    <section class="wrap section" {% if sec.slug %}id="{{ sec.slug }}"{% endif %}>
       {{ head(sec) }}
       <div class="tatler">
         {% set a = sec.items[0] %}
@@ -100,7 +105,7 @@ permalink: /index.html
   {% elif sec.type == "stories" and sec.layout == "band" %}
     <!-- GREY BAND (Tatler Homes Design Awards placement):
          heading + description left, three picture rows right -->
-    <section class="wrap section">
+    <section class="wrap section" {% if sec.slug %}id="{{ sec.slug }}"{% endif %}>
       <div class="feature-band">
         <div class="feature-band__intro">
           <h2 class="feature-band__heading">{{ sec.heading }}</h2>
@@ -124,7 +129,7 @@ permalink: /index.html
 
   {% elif sec.type == "stories" and sec.layout == "list" %}
     <!-- LIST — thumbnail + text rows, ad space alongside -->
-    <section class="wrap section band">
+    <section class="wrap section band" {% if sec.slug %}id="{{ sec.slug }}"{% endif %}>
       <div>
         {{ head(sec) }}
         <ul class="rows">
@@ -153,7 +158,7 @@ permalink: /index.html
     <!-- C-SUITE FEATURE — grey band: big portrait of the featured person
          left, with their short bio and the stories that mention them;
          the newest other stories from the section on the right -->
-    <section class="wrap section">
+    <section class="wrap section" {% if sec.slug %}id="{{ sec.slug }}"{% endif %}>
       <div class="csuite">
         <div class="csuite__head">
           <h2 class="feature-band__heading">{{ sec.heading }}</h2>

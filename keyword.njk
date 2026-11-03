@@ -1,0 +1,31 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: cms.keywords
+  size: 1
+  alias: k
+permalink: "/keyword/{{ k.slug }}/index.html"
+eleventyComputed:
+  pageTitle: "{{ k.name }} — The CEO Channel"
+  pageDescription: "Stories about {{ k.name }} from The CEO Channel"
+---
+{#
+  KEYWORD PAGE — one for every keyword Jamie types on an article,
+  e.g. /keyword/succession/. Opened from the keyword chips under
+  articles. Same card layout as the section pages.
+#}
+    <section class="wrap section">
+      <div class="section__head">
+        <h1 class="section__heading"><span class="keywords__label">Keyword</span> {{ k.name }}</h1>
+      </div>
+      <div class="grid grid--3">
+        {% for a in k.items %}
+        <article class="card">
+          {% if a.image %}<a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" style="object-position: {{ a.imagePosition }}" width="800" height="600" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}
+          <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
+          <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
+          <p class="meta">{{ a.date }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
