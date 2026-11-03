@@ -54,6 +54,9 @@ is the main financial risk.
 - Read `design-system.md` before writing any CSS. Never introduce a colour,
   font, or spacing value that is not defined there.
 - Read `content-model.md` before touching anything CMS-related.
+- After any change to `tina/config.ts`, run `npm run dev` once and commit the
+  updated `tina/tina-lock.json` with it. Otherwise the online build fails with
+  "local Tina schema doesn't match the remote Tina schema".
 - Keep pages as separate, readable HTML/CSS files. Favour clarity over cleverness —
   I need to be able to read this in six months.
 - Every page must work on a phone. Check that first, not last.
