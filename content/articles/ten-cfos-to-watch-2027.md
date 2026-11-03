@@ -11,7 +11,7 @@ tags:
 photo1:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1600&h=900&q=70
+    https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&crop=faces&w=1600&h=900&q=70
   focus: center
   alt: ''
   caption: ''

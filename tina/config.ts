@@ -22,9 +22,10 @@ const focusField = {
   type: "string" as const,
   name: "focus",
   label: "Keep this part in view when cropped",
-  description: "The site trims photos to fit each space. Pick the part that must not be cut off, e.g. Top for a face.",
+  description: "The site trims photos to fit each space. The default keeps the upper part in view so faces aren’t cut off. Choose Top if heads are still cropped, or Exact middle for scenes and buildings.",
   options: [
-    { value: "center", label: "Centre (default)" },
+    { value: "center", label: "Faces / upper centre (default)" },
+    { value: "middle", label: "Exact middle" },
     { value: "top", label: "Top" },
     { value: "bottom", label: "Bottom" },
     { value: "left", label: "Left" },

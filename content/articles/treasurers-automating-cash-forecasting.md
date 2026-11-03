@@ -11,7 +11,7 @@ sponsorName: Peninsula Digital Bank
 photo1:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1600&h=900&q=70
+    https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&crop=faces&w=1600&h=900&q=70
   focus: center
   alt: ''
   caption: ''

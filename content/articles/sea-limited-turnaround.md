@@ -11,7 +11,7 @@ publishedDate: '2026-08-20T08:00:00.000Z'
 photo1:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=1600&h=900&q=70
+    https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&crop=faces&w=1600&h=900&q=70
   focus: center
   alt: ''
   caption: ''

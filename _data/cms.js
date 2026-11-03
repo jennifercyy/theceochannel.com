@@ -40,7 +40,9 @@ function formatDate(iso, withTime) {
 }
 
 // "Keep this part in view" → CSS object-position
-const FOCUS = { center: "50% 50%", top: "50% 0%", bottom: "50% 100%", left: "0% 50%", right: "100% 50%" };
+// "center" (the default) keeps the upper part of the photo in view,
+// where faces usually are; "middle" is the exact centre.
+const FOCUS = { center: "50% 25%", middle: "50% 50%", top: "50% 0%", bottom: "50% 100%", left: "0% 50%", right: "100% 50%" };
 
 // A photo counts only if it has a picture AND "Show this photo" isn't unticked.
 function usable(p) {

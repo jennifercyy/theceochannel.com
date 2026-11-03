@@ -9,7 +9,7 @@ publishedDate: '2026-08-22T06:00:00.000Z'
 photo1:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&h=900&q=70
+    https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&crop=faces&w=1600&h=900&q=70
   focus: center
   alt: ''
   caption: ''

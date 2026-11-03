@@ -21,7 +21,7 @@ tags:
 photo1:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=1600&h=900&q=70
+    https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&crop=faces&w=1600&h=900&q=70
   focus: center
   alt: ''
   caption: ''
@@ -29,7 +29,7 @@ photo1:
 photo2:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&h=800&q=70
+    https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&crop=faces&w=1200&h=800&q=70
   focus: center
   alt: ''
   caption: This is Photo 2 of 7.
@@ -37,7 +37,7 @@ photo2:
 photo4:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=800&h=1000&q=70
+    https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&crop=faces&w=800&h=1000&q=70
   focus: center
   alt: ''
   caption: This is Photo 4 of 7.
@@ -45,7 +45,7 @@ photo4:
 photo5:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&w=800&h=1000&q=70
+    https://images.unsplash.com/photo-1568602471122-7832951cc4c5?auto=format&fit=crop&crop=faces&w=800&h=1000&q=70
   focus: center
   alt: ''
   caption: This is Photo 5 of 7.
@@ -53,7 +53,7 @@ photo5:
 photo7:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1200&h=800&q=70
+    https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&crop=faces&w=1200&h=800&q=70
   focus: center
   alt: ''
   caption: This is Photo 7 of 7.
@@ -61,7 +61,7 @@ photo7:
 photo3:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&h=800&q=70
+    https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&crop=faces&w=1200&h=800&q=70
   focus: center
   alt: ''
   caption: This is Photo 3 of 7.
@@ -69,7 +69,7 @@ photo3:
 photo6:
   show: true
   src: >-
-    https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&h=800&q=70
+    https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&crop=faces&w=1200&h=800&q=70
   focus: center
   alt: ''
   caption: This is Photo 6 of 7.
