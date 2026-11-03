@@ -49,15 +49,16 @@ function usable(p) {
 }
 
 // Split the article text into blocks (paragraphs and headings) and
-// slot photos and the newsletter box in between, at the places the
-// editor promises. "After paragraph N" counts paragraphs only, not
-// sub-headings.
+// slot photos and the newsletter box in between. "After paragraph N"
+// counts paragraphs only, not sub-headings. Usual places:
 //   Photo 2              after paragraph 2
 //   Photo 3              after paragraph 4
 //   Newsletter box       after paragraph 5
 //   Pull quote, Photos 4 + 5 (pair), Instagram   after paragraph 6
 //   Photo 6              after paragraph 8
 //   Photo 7              before the last paragraph
+// Jamie can override 2, 3, 4 (moves the pair), 6 and 7 with
+// "Put it after paragraph number" in the editor.
 // Anything a short article has no room for goes at the end, in order.
 function buildBody(a) {
   const blocks = a.bodyMarkdown
@@ -67,41 +68,43 @@ function buildBody(a) {
     .map((b) => ({ type: "html", html: markdown.render(b) }));
 
   const p = (n) => usable(a[`photo${n}`]);
+  const chosen = (n) => {
+    const v = parseInt(a[`photo${n}`] && a[`photo${n}`].afterParagraph, 10);
+    return v > 0 ? v : null;
+  };
   const slots = [
-    { after: 2, items: [p(2) && { type: "photo", photo: p(2) }] },
-    { after: 4, items: [p(3) && { type: "photo", photo: p(3) }] },
-    { after: 5, items: [{ type: "newsletter" }] },
+    { after: chosen(2) || 2, order: 1, items: [p(2) && { type: "photo", photo: p(2) }] },
+    { after: chosen(3) || 4, order: 2, items: [p(3) && { type: "photo", photo: p(3) }] },
+    { after: 5, order: 3, items: [{ type: "newsletter" }] },
     {
-      after: 6,
+      after: chosen(4) || 6, order: 4,
       items: [
         a.pullQuote && { type: "quote", text: a.pullQuote },
         (p(4) || p(5)) && { type: "pair", left: p(4), right: p(5) },
         a.instagramEmbed && { type: "instagram", html: a.instagramEmbed },
       ],
     },
-    { after: 8, items: [p(6) && { type: "photo", photo: p(6) }] },
-  ].map((s) => ({ ...s, items: s.items.filter(Boolean), placed: false }));
-  const last = p(7) && { type: "photo", photo: p(7) };
-  let lastPlaced = false;
+    { after: chosen(6) || 8, order: 5, items: [p(6) && { type: "photo", photo: p(6) }] },
+    // Photo 7: a chosen paragraph, otherwise "before the last paragraph"
+    { after: chosen(7), beforeLast: !chosen(7), order: 6, items: [p(7) && { type: "photo", photo: p(7) }] },
+  ]
+    .map((s) => ({ ...s, items: s.items.filter(Boolean), placed: false }))
+    .filter((s) => s.items.length);
 
   const parts = [];
   let paragraphs = 0;
+  const lastIndex = blocks.length - 1;
   blocks.forEach((block, i) => {
-    const isLast = i === blocks.length - 1;
-    if (isLast && last && blocks.length > 1) {
-      // Anything still waiting goes before Photo 7, then Photo 7
-      for (const s of slots) if (!s.placed) { parts.push(...s.items); s.placed = true; }
-      parts.push(last);
-      lastPlaced = true;
+    if (i === lastIndex && blocks.length > 1) {
+      for (const s of slots) if (s.beforeLast && !s.placed) { parts.push(...s.items); s.placed = true; }
     }
     parts.push(block);
     if (block.html.startsWith("<p")) {
       paragraphs++;
-      for (const s of slots) if (!s.placed && s.after === paragraphs) { parts.push(...s.items); s.placed = true; }
+      for (const s of slots) if (!s.placed && !s.beforeLast && s.after === paragraphs) { parts.push(...s.items); s.placed = true; }
     }
   });
-  for (const s of slots) if (!s.placed) parts.push(...s.items);
-  if (last && !lastPlaced) parts.push(last);
+  for (const s of slots.sort((x, y) => x.order - y.order)) if (!s.placed) parts.push(...s.items);
   return parts;
 }
 
@@ -141,8 +144,6 @@ module.exports = function () {
     a.lead = usable(a.photo1);
     a.image = a.lead ? a.lead.src : "";
     a.imagePosition = a.lead ? a.lead.position : FOCUS.center;
-    a.ceoList = (a.relatedCEO || []).map((r) => ceos[r.ceo]).filter(Boolean)
-      .map((c) => ({ name: c.name, role: c.role, companyName: c.companyName }));
     a.keywords = (a.tags || []).filter(Boolean);
     a.parts = buildBody(a);
     a.label = a.sponsored ? `Partner content${a.sponsorName ? " · " + a.sponsorName : ""}` : a.cat.name;
@@ -159,12 +160,9 @@ module.exports = function () {
   const byKey = Object.fromEntries(articles.map((a) => [a.key, a]));
   const inSection = (catKey) => articles.filter((a) => a.sectionKeys.includes(catKey));
 
-  // Up next + related (used for "Related" and "Recommended")
+  // Related (4 under the main photo) and Recommended (the next 4)
   for (const a of everything) {
-    const i = articles.indexOf(a);
-    let next = byKey[a.nextArticle] || articles[i + 1] || articles[0];
-    if (next === a) next = null;
-    const others = articles.filter((o) => o !== a && o !== next);
+    const others = articles.filter((o) => o !== a);
     const shared = (o) => (o.keywords || []).some((t) => a.keywords.includes(t));
     const sameSection = (o) => o.sectionKeys.some((k) => a.sectionKeys.includes(k));
     const score = (o) => (shared(o) ? 4 : 0) + (o.format === "Listicle" ? 2 : 0) + (sameSection(o) ? 1 : 0);
@@ -173,15 +171,27 @@ module.exports = function () {
       .sort((x, y) => y.s - x.s || x.idx - y.idx)
       .slice(0, 8)
       .map((x) => summary(x.o));
-    a.upNextSummary = summary(next);
   }
-  for (const a of everything) a.upNext = a.upNextSummary;
 
-  // ---------- CEOs: attach their stories ----------
+  // ---------- C-Suite profiles (/profile/<name>/) ----------
+  const initials = (name) => (name || "").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   for (const c of Object.values(ceos)) {
+    c.url = `/profile/${c.slug}/`;
+    c.initials = initials(c.name);
+    c.portraitPosition = FOCUS[c.focus] || FOCUS.center;
+    c.bodyHtml = c.bodyMarkdown && c.bodyMarkdown.trim() ? markdown.render(c.bodyMarkdown) : "";
     c.stories = articles.filter((a) => (a.relatedCEO || []).some((r) => r.ceo === c.key)).map(summary);
-    c.url = c.stories[0] ? c.stories[0].url : "/";
   }
+  const person = (c) => c && ({
+    name: c.name, role: c.role, companyName: c.companyName, url: c.url, portrait: c.portrait,
+    portraitPosition: c.portraitPosition, initials: c.initials, shortBio: c.shortBio,
+    sponsored: c.sponsored, stories: c.stories,
+  });
+  // People named in each article, with a link to their profile
+  for (const a of everything) a.people = (a.relatedCEO || []).map((r) => person(ceos[r.ceo])).filter(Boolean);
+  const profiles = Object.values(ceos).map((c) => ({
+    ...person(c), slug: c.slug, bodyHtml: c.bodyHtml, linkedin: c.linkedin, website: c.website,
+  }));
 
   // ---------- Homepage ----------
   const h = homepage;
@@ -198,13 +208,23 @@ module.exports = function () {
           items: inSection(s.category).slice(0, COUNT[layout] || 3).map(summary),
         };
       }
+      if (s._template === "csuite") {
+        const who = person(ceos[s.ceo]);
+        const cat = categories[s.category];
+        const theirs = new Set(who ? who.stories.map((x) => x.url) : []);
+        return {
+          type: "csuite", heading: s.heading || (cat && cat.name) || "C-Suites", person: who,
+          moreUrl: cat && cat.url,
+          items: (s.category ? inSection(s.category) : articles).map(summary).filter((x) => !theirs.has(x.url)).slice(0, 3),
+        };
+      }
       if (s._template === "spotlight")
-        return { type: "spotlight", heading: s.heading || "CEO Spotlight", intro: s.intro, items: (s.ceos || []).map((x) => ceos[x.ceo]).filter(Boolean) };
+        return { type: "spotlight", heading: s.heading || "CEO Spotlight", intro: s.intro, items: (s.ceos || []).map((x) => person(ceos[x.ceo])).filter(Boolean) };
       if (s._template === "video") return { type: "video", item: videos[s.video] };
       if (s._template === "newsletter") return { type: "newsletter" };
       return null;
     })
-    .filter((s) => s && (s.type !== "stories" || s.items.length) && (s.type !== "spotlight" || s.items.length) && (s.type !== "video" || s.item));
+    .filter((s) => s && (s.type !== "stories" || s.items.length) && (s.type !== "spotlight" || s.items.length) && (s.type !== "csuite" || s.person) && (s.type !== "video" || s.item));
 
   const home = {
     lead: summary(byKey[h.leadStory]),
@@ -218,5 +238,5 @@ module.exports = function () {
     items: inSection(c.key).map(summary),
   }));
 
-  return { articles, everything, menu, sections: sectionPages, home, site, formatDate };
+  return { articles, everything, menu, sections: sectionPages, profiles, home, site, formatDate };
 };

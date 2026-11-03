@@ -12,6 +12,8 @@ permalink: /index.html
 
 {# A story's picture, if it has one. `ratio` is a media-- class. #}
 {% macro pic(a, ratio, w, ht) %}{% if a.image %}<a class="media media--{{ ratio }}" href="{{ a.url }}"><img src="{{ a.image }}" style="object-position: {{ a.imagePosition }}" width="{{ w }}" height="{{ ht }}" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}{% endmacro %}
+{# A person's portrait, or a grey panel with their initials until one is uploaded #}
+{% macro portrait(c, w, ht) %}<a class="media media--tall portrait" href="{{ c.url }}">{% if c.portrait %}<img src="{{ c.portrait }}" style="object-position: {{ c.portraitPosition }}" width="{{ w }}" height="{{ ht }}" alt="{{ c.name }}" referrerpolicy="no-referrer" loading="lazy" />{% else %}<span class="portrait__initials" aria-hidden="true">{{ c.initials }}</span>{% endif %}</a>{% endmacro %}
 {% macro label(a) %}<p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>{% endmacro %}
 {% macro head(sec) %}
       <div class="section__head">
@@ -20,24 +22,26 @@ permalink: /index.html
       </div>
 {% endmacro %}
 
-    <!-- LEAD STORIES (CNA format) — main story + three beside it -->
+    <!-- LEAD STORY — full-width picture, then three more stories in a row below -->
     {% if h.lead %}
     <section class="wrap lead">
       <article class="lead__main">
-        {{ pic(h.lead, "wide", 1400, 788) }}
+        {{ pic(h.lead, "wide", 1600, 686) }}
         {{ label(h.lead) }}
         <h1 class="lead__headline"><a href="{{ h.lead.url }}">{{ h.lead.title }}</a></h1>
         <p class="lead__standfirst">{{ h.lead.excerpt }}</p>
       </article>
+      {% if h.secondary.length %}
       <div class="lead__side">
         {% for a in h.secondary %}
         <article class="lead__side-item">
-          {% if loop.first %}{{ pic(a, "wide", 700, 394) }}{% endif %}
+          {{ pic(a, "wide", 700, 394) }}
           {{ label(a) }}
           <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
         </article>
         {% endfor %}
       </div>
+      {% endif %}
     </section>
     {% endif %}
 
@@ -144,6 +148,50 @@ permalink: /index.html
       </aside>
     </section>
 
+  {% elif sec.type == "csuite" %}
+    {% set c = sec.person %}
+    <!-- C-SUITE FEATURE — grey band: big portrait of the featured person
+         left, with their short bio and the stories that mention them;
+         the newest other stories from the section on the right -->
+    <section class="wrap section">
+      <div class="csuite">
+        <div class="csuite__head">
+          <h2 class="feature-band__heading">{{ sec.heading }}</h2>
+          <span class="feature-band__bar" aria-hidden="true"></span>
+        </div>
+        <div class="csuite__person">
+          {{ portrait(c, 900, 1125) }}
+          <div class="csuite__info">
+            {% if c.sponsored %}<p class="sponsored">Partner feature</p>{% else %}<p class="tag">C-Suite profile</p>{% endif %}
+            <h3 class="csuite__name"><a href="{{ c.url }}">{{ c.name }}</a></h3>
+            <p class="csuite__role">{{ c.role }}, {{ c.companyName }}</p>
+            {% if c.shortBio %}<p class="csuite__bio">{{ c.shortBio }}</p>{% endif %}
+            {% if c.stories.length %}
+            <ul class="csuite__stories">
+              {% for a in c.stories.slice(0, 3) %}<li><span class="tag">{{ a.storyLabel or a.format }}</span><a href="{{ a.url }}">{{ a.title }}</a></li>{% endfor %}
+            </ul>
+            {% endif %}
+            <a class="more-link more-link--left" href="{{ c.url }}">Full profile</a>
+          </div>
+        </div>
+        <div class="csuite__side">
+          <p class="csuite__side-label">Latest</p>
+          <ul class="feature-band__list">
+            {% for a in sec.items %}
+            <li>
+              {% if a.image %}{{ pic(a, "card", 300, 225) }}{% else %}<span></span>{% endif %}
+              <div>
+                {{ label(a) }}
+                <h3 class="tatler__small-title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% if sec.moreUrl %}<a class="more-link more-link--left" href="{{ sec.moreUrl }}">More</a>{% endif %}
+        </div>
+      </div>
+    </section>
+
   {% elif sec.type == "spotlight" %}
     <!-- CEO SPOTLIGHT — dark band; each CEO lists their stories -->
     <section class="spotlight">
@@ -153,7 +201,7 @@ permalink: /index.html
         <div class="grid grid--4">
           {% for c in sec.items %}
           <article class="ceo">
-            <a class="media media--tall" href="{{ c.url }}"><img src="{{ c.portrait }}" width="600" height="750" alt="{{ c.name }}" referrerpolicy="no-referrer" loading="lazy" /></a>
+            {{ portrait(c, 600, 750) }}
             <div>
               <h3 class="ceo__name"><a href="{{ c.url }}">{{ c.name }}</a></h3>
               <p class="ceo__role">{{ c.role }}, {{ c.companyName }}</p>

@@ -27,11 +27,11 @@
       "layout": "pictures"
     },
     {
-      "_template": "stories",
+      "_template": "csuite",
       "show": true,
       "heading": "C-Suites",
-      "category": "content/categories/c-suites.md",
-      "layout": "band"
+      "ceo": "content/ceos/claire-chiang.md",
+      "category": "content/categories/c-suites.md"
     },
     {
       "_template": "stories",

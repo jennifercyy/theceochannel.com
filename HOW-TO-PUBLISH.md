@@ -30,19 +30,25 @@ Every photo box has a **Show this photo** tick (untick to leave it out without
 deleting it) and **Keep this part in view when cropped** (Centre, Top, Bottom,
 Left, Right — e.g. Top for a face). No photo is required.
 
-| Box | Where it appears | Shape and minimum size |
+**Choosing where a photo goes:** Photos 2, 3, 4, 6 and 7 each have a
+**Put it after paragraph number** box. Leave it empty for the usual place
+below, or type a number (e.g. 3 = after the 3rd paragraph) to suit the
+length of the article. Photo 4's number moves the whole pair (4 and 5),
+with the pull quote and Instagram post.
+
+| Box | Usual place | Shape and minimum size |
 |---|---|---|
 | Photo 1 — Main photo | Top of the article, full width. Also the story's picture on the homepage | Landscape 16:9 · 1600 × 900 px |
 | Photo 2 | After the 2nd paragraph | Landscape 3:2 · 1200 × 800 px |
 | Photo 3 | After the 4th paragraph | Landscape 3:2 · 1200 × 800 px |
 | Photo 4 | After the 6th paragraph, LEFT of a side-by-side pair | Portrait 4:5 · 800 × 1000 px |
-| Photo 5 | After the 6th paragraph, RIGHT of the pair | Portrait 4:5 · 800 × 1000 px |
+| Photo 5 | RIGHT of the pair (always next to Photo 4) | Portrait 4:5 · 800 × 1000 px |
 | Photo 6 | After the 8th paragraph | Landscape 3:2 · 1200 × 800 px |
 | Photo 7 | Before the last paragraph | Landscape 3:2 · 1200 × 800 px |
-| Pull quote | Just before the pair (after the 6th paragraph) | Short text |
+| Pull quote | Just before the pair | Short text |
 | Instagram post | Straight after the pair | Paste the Embed code from Instagram |
 | Newsletter box | After the 5th paragraph (automatic) | — |
-| CEO portrait (in **CEOs**) | CEO Spotlight on the homepage | Portrait 4:5 · 800 × 1000 px |
+| Portrait (in **C-Suite profiles**) | Profile page and homepage C-Suite feature | Portrait 4:5 · 1200 × 1500 px |
 
 Paragraphs are counted without sub-headings. In a short article, anything
 there's no room for goes at the end, in order.
@@ -56,6 +62,20 @@ Click **Homepage**:
   down. Open a section to change its heading, which section it takes stories
   from, its **Layout** (Grid, Pictures, Grey band, List), or to switch it off.
   **+** adds a section; the bin removes it.
+
+## C-Suite profiles (paid features)
+
+Each person in **C-Suite profiles** gets their own page at
+`theceochannel.com/profile/<name>/`: big portrait, job title, short bio,
+full profile, links, and every story that mentions them, newest first.
+
+- Turn on **Paid feature** when a company has paid for the profile — a
+  "Partner feature" label appears on the profile and its homepage feature.
+- To link a story to a profile: in the article, add the person under
+  **C-Suite profiles in this story**. The story then appears on their
+  profile, and the article shows a "View profile" box.
+- To feature someone on the homepage: **Homepage** → open **C-Suites**
+  (C-Suite feature) → **Person to feature on the left**.
 
 ## Menu bar
 

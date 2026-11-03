@@ -116,6 +116,18 @@ eleventyComputed:
           </div>
           {% endif %}
 
+          <!-- PEOPLE IN THIS STORY — links to their C-Suite profile pages -->
+          {% if a.people.length %}
+          <div class="people" data-pagefind-ignore>
+            {% for c in a.people %}
+            <a class="people__item" href="{{ c.url }}">
+              <span class="media media--tall people__pic">{% if c.portrait %}<img src="{{ c.portrait }}" style="object-position: {{ c.portraitPosition }}" alt="" referrerpolicy="no-referrer" loading="lazy" />{% else %}<span class="portrait__initials" aria-hidden="true">{{ c.initials }}</span>{% endif %}</span>
+              <span><span class="tag">In this story</span><span class="people__name">{{ c.name }}</span><span class="people__role">{{ c.role }}, {{ c.companyName }}</span><span class="people__link">View profile</span></span>
+            </a>
+            {% endfor %}
+          </div>
+          {% endif %}
+
           <p class="meta article__end" data-pagefind-ignore>Published {{ a.publishedText }}{% if a.updatedText %} &nbsp;·&nbsp; Updated {{ a.updatedText }}{% endif %}</p>
 
           <div class="ad ad--rectangle" role="complementary" aria-label="Advertisement" data-pagefind-ignore>
@@ -124,21 +136,6 @@ eleventyComputed:
         </div>
       </div>
     </article>
-
-    <!-- UP NEXT -->
-    {% if a.upNext %}{% set n = a.upNext %}
-    <section class="upnext">
-      <div class="wrap section upnext__inner">
-        {% if n.image %}<a class="media media--wide" href="{{ n.url }}"><img src="{{ n.image }}" style="object-position: {{ n.imagePosition }}" width="1000" height="563" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}
-        <div>
-          <p class="tag">Up next · {{ n.cat.name }}</p>
-          <h2 class="upnext__headline"><a href="{{ n.url }}">{{ n.title }}</a></h2>
-          <p>{{ n.excerpt }}</p>
-          <a class="btn" href="{{ n.url }}">Keep reading</a>
-        </div>
-      </div>
-    </section>
-    {% endif %}
 
     <!-- RECOMMENDED — the next four from the related list, with pictures -->
     {% set rec = a.related.slice(4, 8) %}

@@ -34,7 +34,14 @@ const focusField = {
 
 // One photo: a show/hide tick, the picture, its focus point, caption and credit.
 // `where` and `size` are shown to Jamie on the photo box.
-function photo(name: string, label: string, where: string, size: string) {
+// `movable` adds a box to choose which paragraph the photo follows.
+function photo(name: string, label: string, where: string, size: string, movable = "") {
+  const place = movable
+    ? [{
+        type: "number" as const, name: "afterParagraph", label: "Put it after paragraph number (optional)",
+        description: `${movable} Leave empty to use the usual place. Paragraphs are counted without sub-headings.`,
+      }]
+    : [];
   return {
     type: "object" as const,
     name,
@@ -43,6 +50,7 @@ function photo(name: string, label: string, where: string, size: string) {
     fields: [
       { type: "boolean" as const, name: "show", label: "Show this photo", description: "Untick to leave this space out of the article. The photo stays saved." },
       { type: "image" as const, name: "src", label: "Upload photo" },
+      ...place,
       focusField,
       { type: "string" as const, name: "alt", label: "Describe the photo in a few words (for blind readers and Google)" },
       { type: "string" as const, name: "caption", label: "Caption (optional)" },
@@ -132,30 +140,29 @@ export default defineConfig({
 
           // ---------- The seven photos, in the order they appear ----------
           photo("photo1", "Photo 1 of 7 — Main photo", "TOP of the article, full width. Also used for this story on the homepage", "Landscape 16:9, at least 1600 × 900 px"),
-          photo("photo2", "Photo 2 of 7", "After the 2nd paragraph", "Landscape 3:2, at least 1200 × 800 px"),
-          photo("photo3", "Photo 3 of 7", "After the 4th paragraph", "Landscape 3:2, at least 1200 × 800 px"),
-          photo("photo4", "Photo 4 of 7 — left of a pair", "After the 6th paragraph, side by side with Photo 5", "Portrait 4:5, at least 800 × 1000 px"),
-          photo("photo5", "Photo 5 of 7 — right of a pair", "After the 6th paragraph, side by side with Photo 4", "Portrait 4:5, at least 800 × 1000 px"),
-          photo("photo6", "Photo 6 of 7", "After the 8th paragraph", "Landscape 3:2, at least 1200 × 800 px"),
-          photo("photo7", "Photo 7 of 7", "Before the last paragraph", "Landscape 3:2, at least 1200 × 800 px"),
+          photo("photo2", "Photo 2 of 7", "Usually after the 2nd paragraph (you can change this)", "Landscape 3:2, at least 1200 × 800 px", "e.g. 3 puts it after the 3rd paragraph."),
+          photo("photo3", "Photo 3 of 7", "Usually after the 4th paragraph (you can change this)", "Landscape 3:2, at least 1200 × 800 px", "e.g. 5 puts it after the 5th paragraph."),
+          photo("photo4", "Photo 4 of 7 — left of a pair", "Usually after the 6th paragraph, side by side with Photo 5 (you can change this)", "Portrait 4:5, at least 800 × 1000 px", "This moves the whole pair (Photos 4 and 5), with the pull quote and Instagram post that go with it."),
+          photo("photo5", "Photo 5 of 7 — right of a pair", "Always next to Photo 4 — move Photo 4 to move the pair", "Portrait 4:5, at least 800 × 1000 px"),
+          photo("photo6", "Photo 6 of 7", "Usually after the 8th paragraph (you can change this)", "Landscape 3:2, at least 1200 × 800 px", "e.g. 7 puts it after the 7th paragraph."),
+          photo("photo7", "Photo 7 of 7", "Usually before the last paragraph (you can change this)", "Landscape 3:2, at least 1200 × 800 px", "Fill in a number to put it after that paragraph instead."),
           {
             type: "string", name: "instagramEmbed", label: "Instagram post (optional — use when there are no press photos)",
             description: "On Instagram: open the post → ••• → Embed → Copy embed code, then paste it here. It appears straight after the photo pair (Photos 4 and 5).",
             ui: { component: "textarea" },
           },
-          { type: "string", name: "pullQuote", label: "Pull quote (optional)", description: "A short line, shown large just before the photo pair (after the 6th paragraph).", ui: { component: "textarea" } },
+          { type: "string", name: "pullQuote", label: "Pull quote (optional)", description: "A short line, shown large just before the photo pair (Photos 4 and 5), wherever the pair is placed.", ui: { component: "textarea" } },
 
           { type: "rich-text", name: "body", label: "Article text", description: "Type or paste the story. Use Heading 2 for sub-headings. Photos and a newsletter sign-up box are placed automatically.", isBody: true },
 
           // ---------- Linking ----------
           { type: "string", name: "tags", label: "Keywords", list: true, description: "A few words, e.g. succession, banking. Shown under the article, and used to pick Related and Recommended stories." },
           {
-            type: "object", name: "relatedCEO", label: "CEOs in this story", list: true,
-            description: "The story then appears under each CEO in CEO Spotlight.",
-            fields: [{ type: "reference", name: "ceo", label: "CEO", collections: ["ceo"] }],
+            type: "object", name: "relatedCEO", label: "C-Suite profiles in this story", list: true,
+            description: "The story is then listed on each person's profile page and in their homepage feature, and the article links to their profile.",
+            fields: [{ type: "reference", name: "ceo", label: "Person", collections: ["ceo"] }],
           },
           { type: "string", name: "storyLabel", label: "Label in CEO Spotlight (optional)", description: "e.g. Follow-up, Off the Record. Leave empty to use the type of story." },
-          { type: "reference", name: "nextArticle", label: "“Up next” article (optional)", description: "Leave empty and the next-newest story is used.", collections: ["article"] },
 
           // ---------- Partner content ----------
           { type: "boolean", name: "sponsored", label: "This is partner (paid) content", description: "Adds the “Partner content” label wherever the story appears." },
@@ -174,20 +181,27 @@ export default defineConfig({
       },
 
       // ======================================================
-      // CEOs
+      // C-SUITE PROFILES — one page each, at /profile/<name>/
       // ======================================================
       {
         name: "ceo",
-        label: "CEOs",
+        label: "C-Suite profiles",
         path: "content/ceos",
         format: "md",
         fields: [
           { type: "string", name: "name", label: "Name", isTitle: true, required: true },
-          { type: "string", name: "role", label: "Job title", description: "e.g. Group CEO", required: true },
+          { type: "string", name: "role", label: "Job title", description: "e.g. Co-founder and Senior Vice President", required: true },
           { type: "string", name: "companyName", label: "Company", required: true },
-          { type: "image", name: "portrait", label: "Portrait photo", description: "Shown in CEO Spotlight on the homepage — Portrait 4:5, at least 800 × 1000 px", required: true },
-          { type: "string", name: "shortBio", label: "Short bio", ui: { component: "textarea" } },
+          { type: "image", name: "portrait", label: "Portrait photo", description: "Shown large on the profile page and the homepage C-Suite feature — Portrait 4:5, at least 1200 × 1500 px. Until one is uploaded, a grey panel with initials shows." },
+          focusField,
+          { type: "string", name: "shortBio", label: "Short bio", description: "Two or three sentences. Shown on the homepage feature and at the top of the profile page.", ui: { component: "textarea" } },
+          { type: "rich-text", name: "body", label: "Full profile (optional)", description: "Longer profile shown on the profile page.", isBody: true },
           { type: "string", name: "linkedin", label: "LinkedIn link (optional)" },
+          { type: "string", name: "website", label: "Company website (optional)" },
+          {
+            type: "boolean", name: "sponsored", label: "Paid feature",
+            description: "Turn on when the company has paid for this profile. Adds a “Partner feature” label to the profile and its homepage feature.",
+          },
         ],
       },
 
@@ -284,6 +298,17 @@ export default defineConfig({
                 ],
               },
               {
+                name: "csuite",
+                label: "C-Suite feature (big portrait left, stories right)",
+                ui: { defaultItem: { show: true }, itemProps: sectionLabel("C-Suite feature") },
+                fields: [
+                  show("C-Suite feature"),
+                  { type: "string", name: "heading", label: "Heading", description: "e.g. C-Suites" },
+                  { type: "reference", name: "ceo", label: "Person to feature on the left", description: "Their portrait, short bio and the stories that mention them.", collections: ["ceo"] },
+                  { type: "reference", name: "category", label: "Fill the right side with the newest stories from", collections: ["category"] },
+                ],
+              },
+              {
                 name: "spotlight",
                 label: "CEO Spotlight (dark band)",
                 ui: { defaultItem: { show: true }, itemProps: sectionLabel("CEO Spotlight") },
@@ -292,8 +317,8 @@ export default defineConfig({
                   { type: "string", name: "heading", label: "Heading" },
                   { type: "string", name: "intro", label: "Line under the heading" },
                   {
-                    type: "object", name: "ceos", label: "CEOs to feature (4 look best)", list: true,
-                    fields: [{ type: "reference", name: "ceo", label: "CEO", collections: ["ceo"] }],
+                    type: "object", name: "ceos", label: "People to feature (4 look best)", list: true,
+                    fields: [{ type: "reference", name: "ceo", label: "Person", collections: ["ceo"] }],
                   },
                 ],
               },

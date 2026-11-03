@@ -5,6 +5,30 @@ Newest first. Jamie Nonis uses they/them.
 
 ---
 
+## 3 Nov 2026 (afternoon) — lead story, C-Suite profiles, photo positions
+
+Built
+- Homepage lead: main picture now full width; the three other top stories
+  moved into a row underneath.
+- C-Suites band is now a **C-Suite feature**: big portrait of the featured
+  person left (bio + stories that mention them), newest C-Suites stories right.
+  Commercial idea: companies pay Jamie to feature their C-suite figure, with
+  recurring articles linking to the profile.
+- **C-Suite profile pages** at /profile/<name>/ with a "Paid feature" switch
+  (adds "Partner feature" label). Articles show a "View profile" box for
+  each person in the story.
+- Example: **Claire Chiang** (Banyan Group) — profile text from her public
+  bios, no portrait (to be supplied), two clearly marked [Sample] stories.
+- Articles: "Up next" removed. Jamie can now choose which paragraph each photo
+  follows (Photos 2, 3, 4/5 pair, 6, 7); empty = usual place.
+
+To check with Jamie
+- Claire Chiang example: is she a real prospect? If so, Jamie should confirm
+  the profile text and supply a licensed portrait; if not, delete before launch.
+- Price for a paid C-suite feature (Jamie's commercial decision).
+
+---
+
 ## 3 Nov 2026 — second round of client changes
 
 Built and live

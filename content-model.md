@@ -7,6 +7,12 @@ exist means rewriting files by hand. Get it right once.
 
 Each collection below becomes a folder of Markdown files in `/content/`.
 
+> **Revision 5 — 3 Nov 2026 (pm).** CEO collection becomes **C-Suite profiles**
+> with a page each at /profile/<name>/ (portrait, focus, short bio, full
+> profile, LinkedIn, website, Paid feature switch). New homepage block
+> `csuite`. Photos 2, 3, 4, 6, 7 take an optional `afterParagraph`.
+> "Up next" removed (`nextArticle` field dropped).
+>
 > **Revision 4 — 3 Nov 2026.** Sections are now Interviews · C-Suites · Power Up ·
 > Exec Lifestyle (menu) + Leadership (homepage only); no sub-sections or
 > drop-downs. Homepage sections are a drag-to-reorder list. Seven photos per
@@ -38,7 +44,7 @@ field below. Nothing on a page is typed in by hand.
 | Homepage lead story + 3 secondary stories | Homepage settings |
 | Homepage sections, in order | Homepage settings → `sections` blocks |
 | Article: Related (4, under main photo) | Related rule |
-| Article: Up next | `nextArticle` if set, otherwise the next-newest article |
+| C-Suite profile page | C-Suite profiles + every article listing the person in `relatedCEO` |
 | Article: Recommended (4) | Related rule, next four |
 | Article: Keywords | `tags` |
 | Sign-up forms (pop-up, homepage, in article) | Site settings → `mailchimpFormUrl` |
@@ -53,7 +59,7 @@ field below. Nothing on a page is typed in by hand.
 | Picture section (Tatler photo layout) | Homepage settings → chosen category; newest 4 |
 | Feature band (grey panel) | Homepage settings → heading, description, 3 chosen articles |
 | List section | Homepage settings → chosen category; newest 4 |
-| Article: Up next | `nextArticle` if set, otherwise the next-newest article |
+| C-Suite profile page | C-Suite profiles + every article listing the person in `relatedCEO` |
 | Article: Related / More to read | Rule (see "Related articles rule") |
 | Footer contact details | Site settings |
 
@@ -94,25 +100,23 @@ clearer — the client picks the lead story directly instead of ticking a box).
 
 ---
 
-## CEO / Leader
-`/content/ceos/`
+## C-Suite profile
+`/content/ceos/` — page at `/profile/<name>/`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | text | yes | |
-| slug | text | yes | |
-| role | text | yes | e.g. "Group CEO" |
-| company | reference → Brand | no | |
-| companyName | text | no | **NEW.** Used when there's no Brand page for the company |
-| portrait | image | yes | Portrait 4:5 |
-| shortBio | long text | yes | |
-| fullBio | rich text | no | |
-| linkedin | url | no | |
+| role | text | yes | Job title |
+| companyName | text | yes | |
+| portrait | image | no | 4:5. Empty = grey panel with initials |
+| focus | choice | no | What stays in view when the portrait is cropped |
+| shortBio | long text | no | Homepage feature + top of profile page |
+| body | rich text | no | Full profile |
+| linkedin · website | url | no | |
+| sponsored | boolean | no | "Paid feature" → "Partner feature" label |
 
-Their articles are not entered here: any article that lists this CEO in
-`relatedCEO` appears on their card and profile page automatically, newest first.
-
-Removed from revision 1: `featured` (moved to Homepage settings).
+Stories are not entered here: any article that lists the person under
+`relatedCEO` appears on the profile automatically, newest first.
 
 ---
 
@@ -198,12 +202,13 @@ Block types (`_template`):
 | Block | Fields | Notes |
 |---|---|---|
 | stories | show, heading, category, layout | layout = grid (3) · pictures (Tatler, 4) · band (grey, 3) · list (4, with ad space). Newest stories whose main or "also show in" section matches |
+| csuite | show, heading, ceo, category | Grey band: featured person's portrait, bio and stories left; newest stories from category right |
 | spotlight | show, heading, intro, ceos | Dark CEO band |
 | video | show, video | |
 | newsletter | show | "Sharpen your game" sign-up |
 
 Default order (client, 3 Nov 2026): Interviews (grid) → Leadership (pictures) →
-C-Suites (band) → Exec Lifestyle (list) → Power Up (grid) → CEO Spotlight
+C-Suites (C-Suite feature: Claire Chiang, sample) → Exec Lifestyle (list) → Power Up (grid) → CEO Spotlight
 (hidden **[confirm]**) → Newsletter. Partner-content video and Lists & rankings
 band removed.
 

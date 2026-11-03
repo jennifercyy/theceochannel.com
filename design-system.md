@@ -110,6 +110,11 @@ photograph.
   secondary stories beside it; replaces the full-bleed hero)
 - Menu bar (navy): logo or wordmark, sections in capitals, SUBSCRIBE button
   (opens the sign-up pop-up), search icon. No drop-downs.
+- C-Suite feature band (`--wash`): heading + bar across the top; big 4:5
+  portrait + name, role, bio and their stories left; "Latest" rows right
+- C-Suite profile page: portrait left, name/role/bio/full profile right,
+  then their stories in a grid. Initials panel (`--rule`) until a portrait exists
+- Lead story: full-width 21:9 picture, then three stories in a row below
 - Sign-up pop-up and inline sign-up box: "Sharpen your game"
 - Search pop-up (Pagefind)
 - CEO Spotlight card (portrait, name, role, two or more articles on that CEO)

@@ -18,7 +18,6 @@ pullQuote: >-
 tags:
   - finance
   - growth
-nextArticle: ''
 photo1:
   show: true
   src: >-

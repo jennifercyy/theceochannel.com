@@ -1,0 +1,54 @@
+---
+layout: layouts/base.njk
+pagination:
+  data: cms.profiles
+  size: 1
+  alias: c
+permalink: "/profile/{{ c.slug }}/index.html"
+eleventyComputed:
+  pageTitle: "{{ c.name }}, {{ c.role }}, {{ c.companyName }} — The CEO Channel"
+  pageDescription: "{{ c.shortBio }}"
+  pageImage: "{{ c.portrait }}"
+---
+{#
+  C-SUITE PROFILE PAGE — one for every person in “C-Suite profiles”
+  in the editor, at /profile/<name>/. Every article that lists the
+  person under “C-Suite profiles in this story” appears here,
+  newest first, so recurring stories build up on one page.
+#}
+    <section class="wrap profile">
+      <div class="profile__pic">
+        <span class="media media--tall portrait">{% if c.portrait %}<img src="{{ c.portrait }}" style="object-position: {{ c.portraitPosition }}" width="900" height="1125" alt="{{ c.name }}" referrerpolicy="no-referrer" />{% else %}<span class="portrait__initials" aria-hidden="true">{{ c.initials }}</span>{% endif %}</span>
+      </div>
+      <div class="profile__text">
+        {% if c.sponsored %}<p class="sponsored">Partner feature</p>{% else %}<p class="tag">C-Suite profile</p>{% endif %}
+        <h1 class="profile__name">{{ c.name }}</h1>
+        <p class="profile__role">{{ c.role }}, {{ c.companyName }}</p>
+        {% if c.shortBio %}<p class="profile__bio">{{ c.shortBio }}</p>{% endif %}
+        {% if c.bodyHtml %}<div class="profile__body">{{ c.bodyHtml | safe }}</div>{% endif %}
+        {% if c.linkedin or c.website %}
+        <p class="profile__links">
+          {% if c.linkedin %}<a href="{{ c.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+          {% if c.website %}<a href="{{ c.website }}" target="_blank" rel="noopener">Company website</a>{% endif %}
+        </p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="wrap section">
+      <div class="section__head"><h2 class="section__heading">Stories featuring {{ c.name }}</h2></div>
+      {% if c.stories.length %}
+      <div class="grid grid--3">
+        {% for a in c.stories %}
+        <article class="card">
+          {% if a.image %}<a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" style="object-position: {{ a.imagePosition }}" width="800" height="600" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}
+          <p class="tag">{{ a.storyLabel or a.format }}</p>
+          <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+          <p class="meta">{{ a.date }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="meta">No stories yet.</p>
+      {% endif %}
+    </section>
