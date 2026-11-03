@@ -11,21 +11,39 @@
 // No `router` settings on purpose: our pages are plain HTML, so Tina's
 // side-by-side visual preview can't attach to them. Without a router,
 // clicking an item opens the full-screen form, which is what we want.
+// Drafts get their own preview address instead (see the Draft switch).
 // ============================================================
 import { defineConfig } from "tinacms";
 
 // ---------- Reusable pieces ----------
 
-// One photo: the picture itself, plus caption and credit.
-// `where` and `size` are shown to Jamie under the upload box.
-function photo(name: string, label: string, where: string, size: string, required = false) {
+// Which part of a photo to keep in view when the site crops it.
+const focusField = {
+  type: "string" as const,
+  name: "focus",
+  label: "Keep this part in view when cropped",
+  description: "The site trims photos to fit each space. Pick the part that must not be cut off, e.g. Top for a face.",
+  options: [
+    { value: "center", label: "Centre (default)" },
+    { value: "top", label: "Top" },
+    { value: "bottom", label: "Bottom" },
+    { value: "left", label: "Left" },
+    { value: "right", label: "Right" },
+  ],
+};
+
+// One photo: a show/hide tick, the picture, its focus point, caption and credit.
+// `where` and `size` are shown to Jamie on the photo box.
+function photo(name: string, label: string, where: string, size: string) {
   return {
     type: "object" as const,
     name,
     label,
     description: `${where} — ${size}`,
     fields: [
-      { type: "image" as const, name: "src", label: "Upload photo", required },
+      { type: "boolean" as const, name: "show", label: "Show this photo", description: "Untick to leave this space out of the article. The photo stays saved." },
+      { type: "image" as const, name: "src", label: "Upload photo" },
+      focusField,
       { type: "string" as const, name: "alt", label: "Describe the photo in a few words (for blind readers and Google)" },
       { type: "string" as const, name: "caption", label: "Caption (optional)" },
       { type: "string" as const, name: "credit", label: "Photo credit (optional)", description: "e.g. The CEO Channel, or Courtesy of Straits Meridian" },
@@ -33,23 +51,18 @@ function photo(name: string, label: string, where: string, size: string, require
   };
 }
 
-// A switch that shows or hides one homepage section.
-function show(label: string) {
-  return { type: "boolean" as const, name: "show", label: `Show “${label}” on the homepage`, description: "Turn off to hide the whole section. Nothing is deleted." };
-}
+// Name shown for each homepage section in the editor's list,
+// e.g. "Interviews" or "CEO Spotlight (hidden)".
+const sectionLabel = (fallback: string) => (item: any) => ({
+  label: `${item?.heading || fallback}${item?.show === false ? "  (hidden)" : ""}`,
+});
 
-// A list where Jamie picks articles one by one.
-function pickArticles(name: string, label: string, description: string) {
-  return {
-    type: "object" as const,
-    name,
-    label,
-    description,
-    list: true,
-    ui: { itemProps: (item: any) => ({ label: item?.article ? item.article.split("/").pop().replace(".md", "") : "Choose an article" }) },
-    fields: [{ type: "reference" as const, name: "article", label: "Article", collections: ["article"] }],
-  };
-}
+const show = (label: string) => ({
+  type: "boolean" as const,
+  name: "show",
+  label: `Show “${label}”`,
+  description: "Turn off to hide this section. Nothing is deleted.",
+});
 
 const branch =
   process.env.GITHUB_BRANCH || process.env.VERCEL_GIT_COMMIT_REF || process.env.HEAD || "main";
@@ -57,7 +70,7 @@ const branch =
 export default defineConfig({
   branch,
 
-  // Filled in from Tina Cloud once the account is set up (see HOW-TO-PUBLISH.md).
+  // Filled in from Tina Cloud (GitHub secrets TINA_CLIENT_ID, TINA_TOKEN).
   clientId: process.env.TINA_CLIENT_ID || null,
   token: process.env.TINA_TOKEN || null,
 
@@ -93,13 +106,18 @@ export default defineConfig({
           { type: "string", name: "excerpt", label: "Standfirst", description: "One or two sentences under the headline. Also shown on homepage cards.", ui: { component: "textarea" }, required: true },
           {
             type: "boolean", name: "draft", label: "Draft — hide this article from the website",
-            description: "Leave ON while writing. Turn OFF and press Save to publish.",
+            description: "Leave ON while writing. To preview: press Save, wait 2 minutes, then open theceochannel.com/preview/ followed by the name shown at the top of this page (e.g. /preview/my-headline/). Turn OFF and Save to publish.",
           },
 
-          { type: "reference", name: "category", label: "Section", description: "Pick the most specific one, e.g. Succession rather than Leadership.", collections: ["category"], required: true },
+          { type: "reference", name: "category", label: "Section", description: "The article's main section. It shows as the label above the headline.", collections: ["category"], required: true },
+          {
+            type: "object", name: "alsoIn", label: "Also show in these homepage sections (optional)", list: true,
+            description: "The article also appears in these sections on the homepage and their pages.",
+            fields: [{ type: "reference", name: "category", label: "Section", collections: ["category"] }],
+          },
           {
             type: "string", name: "format", label: "Type of story", required: true,
-            description: "“Interview” stories appear in Latest interviews. “List” stories are favoured in Related reading.",
+            description: "“List” stories are favoured in Recommended and Related reading.",
             options: [
               { value: "Interview", label: "Interview" },
               { value: "Profile", label: "Profile" },
@@ -112,29 +130,31 @@ export default defineConfig({
           { type: "datetime", name: "publishedDate", label: "Published on", ui: { timeFormat: "h:mm A" }, required: true },
           { type: "datetime", name: "updatedDate", label: "Updated on (optional)", description: "Fill in when you edit a story after publishing. Shows as “Updated …”.", ui: { timeFormat: "h:mm A" } },
 
-          // ---------- The five photos, in the order they appear ----------
-          photo("photo1", "Photo 1 of 5 — Main photo", "TOP of the article, full width under the headline. Also used for this story everywhere on the homepage (cropped to fit)", "Landscape 16:9, at least 1600 × 900 px", true),
-          photo("photo2", "Photo 2 of 5", "Inside the article, after the 2nd paragraph", "Landscape 3:2, at least 1200 × 800 px"),
-          photo("photo3", "Photo 3 of 5 — left of a pair", "MIDDLE of the article, side by side with Photo 4", "Portrait 4:5, at least 800 × 1000 px"),
-          photo("photo4", "Photo 4 of 5 — right of a pair", "MIDDLE of the article, side by side with Photo 3", "Portrait 4:5, at least 800 × 1000 px"),
-          photo("photo5", "Photo 5 of 5", "Near the END, before the last paragraph", "Landscape 3:2, at least 1200 × 800 px"),
+          // ---------- The seven photos, in the order they appear ----------
+          photo("photo1", "Photo 1 of 7 — Main photo", "TOP of the article, full width. Also used for this story on the homepage", "Landscape 16:9, at least 1600 × 900 px"),
+          photo("photo2", "Photo 2 of 7", "After the 2nd paragraph", "Landscape 3:2, at least 1200 × 800 px"),
+          photo("photo3", "Photo 3 of 7", "After the 4th paragraph", "Landscape 3:2, at least 1200 × 800 px"),
+          photo("photo4", "Photo 4 of 7 — left of a pair", "After the 6th paragraph, side by side with Photo 5", "Portrait 4:5, at least 800 × 1000 px"),
+          photo("photo5", "Photo 5 of 7 — right of a pair", "After the 6th paragraph, side by side with Photo 4", "Portrait 4:5, at least 800 × 1000 px"),
+          photo("photo6", "Photo 6 of 7", "After the 8th paragraph", "Landscape 3:2, at least 1200 × 800 px"),
+          photo("photo7", "Photo 7 of 7", "Before the last paragraph", "Landscape 3:2, at least 1200 × 800 px"),
           {
             type: "string", name: "instagramEmbed", label: "Instagram post (optional — use when there are no press photos)",
-            description: "On Instagram: open the post → ••• → Embed → Copy embed code, then paste it here. It appears straight after the photo pair (Photos 3 and 4).",
+            description: "On Instagram: open the post → ••• → Embed → Copy embed code, then paste it here. It appears straight after the photo pair (Photos 4 and 5).",
             ui: { component: "textarea" },
           },
-          { type: "string", name: "pullQuote", label: "Pull quote (optional)", description: "A short line from the interview, shown large in the middle of the article, just before Photos 3 and 4.", ui: { component: "textarea" } },
+          { type: "string", name: "pullQuote", label: "Pull quote (optional)", description: "A short line, shown large just before the photo pair (after the 6th paragraph).", ui: { component: "textarea" } },
 
-          { type: "rich-text", name: "body", label: "Article text", description: "Type or paste the story. Use Heading 2 for sub-headings. Photos are placed automatically — see the photo boxes above for where.", isBody: true },
+          { type: "rich-text", name: "body", label: "Article text", description: "Type or paste the story. Use Heading 2 for sub-headings. Photos and a newsletter sign-up box are placed automatically.", isBody: true },
 
           // ---------- Linking ----------
+          { type: "string", name: "tags", label: "Keywords", list: true, description: "A few words, e.g. succession, banking. Shown under the article, and used to pick Related and Recommended stories." },
           {
             type: "object", name: "relatedCEO", label: "CEOs in this story", list: true,
             description: "The story then appears under each CEO in CEO Spotlight.",
             fields: [{ type: "reference", name: "ceo", label: "CEO", collections: ["ceo"] }],
           },
           { type: "string", name: "storyLabel", label: "Label in CEO Spotlight (optional)", description: "e.g. Follow-up, Off the Record. Leave empty to use the type of story." },
-          { type: "string", name: "tags", label: "Topics (optional)", list: true, description: "A few words, e.g. succession, banking. Used to pick Related reading." },
           { type: "reference", name: "nextArticle", label: "“Up next” article (optional)", description: "Leave empty and the next-newest story is used.", collections: ["article"] },
 
           // ---------- Partner content ----------
@@ -181,10 +201,9 @@ export default defineConfig({
         format: "md",
         fields: [
           { type: "string", name: "name", label: "Name", isTitle: true, required: true },
-          { type: "boolean", name: "showInMenu", label: "Show in the menu", description: "Turn off to hide this section (or sub-section) from the menu. Articles in it stay online." },
-          { type: "reference", name: "parent", label: "Sits under (optional)", description: "Leave empty for a main menu section. Pick a section to make this a sub-section in its drop-down.", collections: ["category"] },
-          { type: "number", name: "order", label: "Position in the menu", description: "1 = first" },
-          { type: "string", name: "description", label: "Short description (optional)", ui: { component: "textarea" } },
+          { type: "boolean", name: "showInMenu", label: "Show in the menu bar", description: "Turn off to keep this section off the menu bar. Its articles and homepage section stay online." },
+          { type: "number", name: "order", label: "Position in the menu", description: "1 = first (left)" },
+          { type: "string", name: "description", label: "Short description (optional)", description: "Shown on the section's own page, and in the grey band layout.", ui: { component: "textarea" } },
         ],
       },
 
@@ -235,75 +254,86 @@ export default defineConfig({
         ui: { allowedActions: { create: false, delete: false } },
         fields: [
           { type: "reference", name: "leadStory", label: "Main story (top left, biggest picture)", collections: ["article"], required: true },
-          pickArticles("secondaryStories", "Three stories beside the main story", "Pick exactly three. The first one shows with its picture."),
-
           {
-            type: "object", name: "latestInterviews", label: "Latest interviews",
-            description: "Fills itself with the three newest stories whose type is Interview.",
-            fields: [show("Latest interviews")],
+            type: "object", name: "secondaryStories", label: "Three stories beside the main story", list: true,
+            description: "Pick exactly three. The first one shows with its picture.",
+            ui: { itemProps: (item: any) => ({ label: item?.article ? item.article.split("/").pop().replace(".md", "") : "Choose an article" }) },
+            fields: [{ type: "reference", name: "article", label: "Article", collections: ["article"] }],
           },
           {
-            type: "object", name: "spotlight", label: "CEO Spotlight (dark band)",
-            fields: [
-              show("CEO Spotlight"),
-              { type: "string", name: "intro", label: "Line under the heading" },
+            type: "object", name: "sections", label: "Sections, top to bottom (drag ⠿ to reorder)", list: true,
+            description: "Drag a section up or down to move it on the homepage. Press + to add a section; the bin removes it.",
+            templates: [
               {
-                type: "object", name: "ceos", label: "CEOs to feature (4 look best)", list: true,
-                fields: [{ type: "reference", name: "ceo", label: "CEO", collections: ["ceo"] }],
+                name: "stories",
+                label: "Section of stories",
+                ui: { defaultItem: { show: true, layout: "grid" }, itemProps: sectionLabel("New section of stories") },
+                fields: [
+                  show("this section"),
+                  { type: "string", name: "heading", label: "Heading", description: "Shown in capitals on the site" },
+                  { type: "reference", name: "category", label: "Take the newest stories from", collections: ["category"] },
+                  {
+                    type: "string", name: "layout", label: "Layout",
+                    options: [
+                      { value: "grid", label: "Grid — three cards in a row" },
+                      { value: "pictures", label: "Pictures — one tall, one wide, two small (Tatler style)" },
+                      { value: "band", label: "Grey band — description left, three small pictures right" },
+                      { value: "list", label: "List — four rows with small pictures" },
+                    ],
+                  },
+                ],
+              },
+              {
+                name: "spotlight",
+                label: "CEO Spotlight (dark band)",
+                ui: { defaultItem: { show: true }, itemProps: sectionLabel("CEO Spotlight") },
+                fields: [
+                  show("CEO Spotlight"),
+                  { type: "string", name: "heading", label: "Heading" },
+                  { type: "string", name: "intro", label: "Line under the heading" },
+                  {
+                    type: "object", name: "ceos", label: "CEOs to feature (4 look best)", list: true,
+                    fields: [{ type: "reference", name: "ceo", label: "CEO", collections: ["ceo"] }],
+                  },
+                ],
+              },
+              {
+                name: "video",
+                label: "Video",
+                ui: { defaultItem: { show: true }, itemProps: sectionLabel("Video") },
+                fields: [
+                  show("Video"),
+                  { type: "reference", name: "video", label: "Video to feature", collections: ["video"] },
+                ],
+              },
+              {
+                name: "newsletter",
+                label: "Newsletter sign-up",
+                ui: { defaultItem: { show: true }, itemProps: sectionLabel("Newsletter sign-up") },
+                fields: [show("Newsletter sign-up")],
               },
             ],
           },
-          {
-            type: "object", name: "photoSection", label: "Picture section (Tatler-style photo layout)",
-            description: "One tall picture on the left, one wide and two small on the right. Fills itself with the four newest stories in the section you choose.",
-            fields: [
-              show("Picture section"),
-              { type: "string", name: "heading", label: "Heading" },
-              { type: "reference", name: "category", label: "Take stories from this section", collections: ["category"] },
-            ],
-          },
-          {
-            type: "object", name: "video", label: "Video block",
-            fields: [
-              show("Video block"),
-              { type: "reference", name: "video", label: "Video to feature", collections: ["video"] },
-            ],
-          },
-          {
-            type: "object", name: "featureBand", label: "Feature band (grey panel)",
-            description: "Heading and description on the left, three stories with small pictures on the right.",
-            fields: [
-              show("Feature band"),
-              { type: "string", name: "heading", label: "Heading" },
-              { type: "string", name: "description", label: "Description", ui: { component: "textarea" } },
-              { type: "reference", name: "viewAll", label: "“View all” goes to this section", collections: ["category"] },
-              pickArticles("articles", "Three stories", "Pick three."),
-            ],
-          },
-          {
-            type: "object", name: "insights", label: "List section",
-            description: "A list of four stories with small pictures, newest first, from the section you choose.",
-            fields: [
-              show("List section"),
-              { type: "string", name: "heading", label: "Heading" },
-              { type: "reference", name: "category", label: "Take stories from this section", collections: ["category"] },
-            ],
-          },
-          { type: "object", name: "newsletter", label: "Newsletter sign-up", fields: [show("Newsletter sign-up")] },
         ],
       },
 
       // ======================================================
-      // SITE SETTINGS — footer details
+      // SITE SETTINGS — logo, search, newsletter, footer
       // ======================================================
       {
         name: "site",
-        label: "Footer & contact",
+        label: "Site settings",
         path: "content/settings",
         format: "json",
         match: { include: "site" },
         ui: { allowedActions: { create: false, delete: false } },
         fields: [
+          { type: "image", name: "logo", label: "Logo for the menu bar (optional)", description: "Shown on the navy menu bar instead of the words THE CEO CHANNEL. A white or light logo, PNG or SVG with a transparent background, at least 400 px wide." },
+          { type: "boolean", name: "searchEnabled", label: "Show the search icon", description: "Turn off to hide search from the site." },
+          {
+            type: "string", name: "mailchimpFormUrl", label: "Mailchimp sign-up address",
+            description: "Where newsletter sign-ups are sent. In Mailchimp: Audience → Signup forms → Embedded forms → copy the address after action=\" in the code. Until this is filled in, the sign-up boxes show a ‘coming soon’ message.",
+          },
           { type: "string", name: "tagline", label: "Line under the logo in the footer" },
           { type: "string", name: "editorialEmail", label: "Editorial email" },
           { type: "string", name: "partnershipsEmail", label: "Partnerships email" },

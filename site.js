@@ -1,64 +1,73 @@
 /* ============================================================
    The CEO Channel — shared page behaviour
    1. Hamburger menu on phones
-   2. Section menus: click a section to open its sub-sections,
-      click again (or press Esc, or click elsewhere) to close.
-      Only one open at a time.
-   3. Nav shadow once the page scrolls
-   4. Share buttons on articles (fills in the current page link)
+   2. Nav shadow once the page scrolls
+   3. Pop-ups: SUBSCRIBE and search (open/close)
+   4. Sign-up forms before Mailchimp is connected
+   5. Search (only when switched on in Site settings)
+   6. Share buttons on articles (fills in the current page link)
    ============================================================ */
 (function () {
+  /* ---------- 1–2. Menu bar ---------- */
   var nav = document.getElementById('nav');
   if (nav) {
     var toggle = nav.querySelector('.nav__toggle');
-    var buttons = nav.querySelectorAll('.menu__btn');
-
-    function closeAll(except) {
-      buttons.forEach(function (b) {
-        if (b === except) return;
-        b.setAttribute('aria-expanded', 'false');
-        document.getElementById(b.getAttribute('aria-controls')).hidden = true;
-      });
-    }
-
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var open = btn.getAttribute('aria-expanded') === 'true';
-        closeAll(btn);
-        btn.setAttribute('aria-expanded', open ? 'false' : 'true');
-        document.getElementById(btn.getAttribute('aria-controls')).hidden = open;
-      });
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!nav.contains(e.target)) closeAll();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeAll();
-    });
-
-    // Following a sub-section link closes everything
-    nav.addEventListener('click', function (e) {
-      if (e.target.closest('.menu__panel a')) {
-        closeAll();
-        nav.classList.remove('nav--open');
-        toggle.setAttribute('aria-expanded', 'false');
-      }
-    });
-
     toggle.addEventListener('click', function () {
       var open = nav.classList.toggle('nav--open');
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
     });
-
     window.addEventListener('scroll', function () {
       nav.classList.toggle('nav--scrolled', window.scrollY > 8);
     }, { passive: true });
   }
 
-  /* ---------- Share buttons ---------- */
+  /* ---------- 3. Pop-ups ---------- */
+  var searchStarted = false;
+  document.querySelectorAll('[data-open]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var dialog = document.getElementById(btn.getAttribute('data-open'));
+      if (!dialog || !dialog.showModal) return;
+      if (nav) nav.classList.remove('nav--open');
+      dialog.showModal();
+      if (dialog.id === 'search-dialog') startSearch(dialog);
+      var field = dialog.querySelector('input');
+      if (field) setTimeout(function () { field.focus(); }, 50);
+    });
+  });
+  document.querySelectorAll('dialog.modal').forEach(function (dialog) {
+    dialog.querySelector('[data-close]').addEventListener('click', function () { dialog.close(); });
+    // Click on the dark area outside the box closes it
+    dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+  });
+
+  /* ---------- 4. Sign-up forms not yet connected to Mailchimp ---------- */
+  document.querySelectorAll('form[data-not-connected]').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      form.querySelector('.subscribe__note').hidden = false;
+    });
+  });
+
+  /* ---------- 5. Search ---------- */
+  function startSearch(dialog) {
+    if (searchStarted || typeof PagefindUI === 'undefined') return;
+    searchStarted = true;
+    new PagefindUI({
+      element: '#search',
+      showSubResults: false,
+      showImages: true,
+      resetStyles: false,
+      translations: { placeholder: 'Search The CEO Channel' }
+    });
+    setTimeout(function () {
+      var field = dialog.querySelector('input');
+      if (field) field.focus();
+    }, 100);
+  }
+
+  /* ---------- 6. Share buttons ---------- */
   var share = document.querySelector('.share');
   if (share) {
     var url = encodeURIComponent(window.location.href);

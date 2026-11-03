@@ -1,0 +1,17 @@
+{#
+  Newsletter sign-up form, used in three places: the SUBSCRIBE
+  pop-up, the homepage newsletter section, and the box inside
+  articles. Sign-ups go to the Mailchimp address set in the editor
+  under Site settings → Mailchimp sign-up address.
+
+  Use: {% from "partials/subscribe.njk" import subscribeForm %}
+       {{ subscribeForm(cms.site, "popup") }}
+#}
+{% macro subscribeForm(site, where) %}
+<form class="subscribe__form" {% if site.mailchimpFormUrl %}action="{{ site.mailchimpFormUrl }}" method="post" target="_blank"{% else %}data-not-connected{% endif %}>
+  <label class="visually-hidden" for="email-{{ where }}">Email address</label>
+  <input type="email" id="email-{{ where }}" name="EMAIL" placeholder="Your email address" autocomplete="email" required />
+  <button type="submit">Subscribe</button>
+  <p class="subscribe__note" hidden>Sign-up is being set up. Please check back soon.</p>
+</form>
+{% endmacro %}

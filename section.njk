@@ -11,7 +11,8 @@ eleventyComputed:
 ---
 {#
   SECTION PAGE — one for every section and sub-section in the menu
-  (e.g. /section/leadership/). Lists its stories, newest first.
+  (e.g. /section/interviews/). Lists its stories, newest first,
+  including stories that are only “also shown” in this section.
 #}
     <section class="wrap section">
       <div class="section__head">
@@ -23,7 +24,7 @@ eleventyComputed:
       <div class="grid grid--3">
         {% for a in sec.items %}
         <article class="card">
-          <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="800" height="600" alt="" referrerpolicy="no-referrer" /></a>
+          {% if a.image %}<a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" style="object-position: {{ a.imagePosition }}" width="800" height="600" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}
           <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
           <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
           <p class="meta">{{ a.date }}</p>

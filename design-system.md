@@ -19,6 +19,11 @@ here first, then apply it everywhere.
 | `--muted` | `#6E6E6E` | Bylines, dates, captions, metadata |
 | `--rule` | `#E4E1DA` | Dividers, borders, card edges |
 | `--wash` | `#F3F2EF` | Light grey panel: feature band, image placeholders while loading |
+| `--navy` | `#14213D` | Menu bar background. **INTERIM** — replace with the client's navy hex when supplied |
+
+Share buttons only (article share bar) use each network's own brand colour:
+`--whatsapp #25D366` · `--telegram #26A5E4` · `--facebook #1877F2` ·
+`--linkedin #0A66C2` · X uses `--ink`. These appear nowhere else.
 
 Reasoning: bronze, per client feedback (Oct 2026: "more bronze"). It reads
 "business authority" rather than "lifestyle magazine" and survives being placed
@@ -57,7 +62,8 @@ Both free on Google Fonts.
 
 Rules:
 - Body line length capped at 68 characters.
-- Sentence case for headlines and section headings.
+- Sentence case for headlines. Section headings are set in capitals by CSS
+  (type them normally in the editor).
 - ALL-CAPS permitted ONLY for category tags — 0.6875rem, letter-spacing 0.08em,
   in `--accent`. Nowhere else.
 - Never italicise or recolour a single word inside a headline for emphasis.
@@ -102,7 +108,10 @@ photograph.
   heading + short bronze bar + description left, three picture rows right
 - Lead story + secondary stories block (main story with clickable title, three
   secondary stories beside it; replaces the full-bleed hero)
-- Section menu with drop-down sub-sections (click to open/close; accordion on phones)
+- Menu bar (navy): logo or wordmark, sections in capitals, SUBSCRIBE button
+  (opens the sign-up pop-up), search icon. No drop-downs.
+- Sign-up pop-up and inline sign-up box: "Sharpen your game"
+- Search pop-up (Pagefind)
 - CEO Spotlight card (portrait, name, role, two or more articles on that CEO)
 - Partner content video block (labelled; links quietly to Partner with us)
 - Photo placeholder (grey block, "Photo n of 5")

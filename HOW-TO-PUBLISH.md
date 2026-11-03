@@ -11,53 +11,61 @@ After you press **Save**, the website updates by itself in about 2 minutes.
 
 ## Publish an article
 
-1. Log in, then click **Articles** → **Create new**.
-2. Fill in **Headline** and **Standfirst**.
+1. Log in, then click **Articles** → **Add File**.
+2. Fill in **Headline**, **Standfirst**, **Section** and **Type of story** first —
+   the editor won't open the photo boxes while these are empty.
 3. Leave **Draft** switched ON while you work. Nobody can see a draft.
-4. Pick the **Section** (the most specific one, e.g. *Succession* rather than
-   *Leadership*) and the **Type of story**.
-5. Add photos (see the photo map below).
-6. Type or paste the story into **Article text**. Use *Heading 2* for sub-headings.
-7. When it is ready: switch **Draft** OFF and press **Save**.
+4. Optional: **Also show in these homepage sections** puts the story in more
+   than one section (e.g. Interviews *and* Leadership).
+5. Add photos (see the photo map below), then the **Article text**.
+6. Add a few **Keywords** — they show under the article.
+7. **Preview:** press Save, wait about 2 minutes, then open
+   `theceochannel.com/preview/` + the article's name (shown at the top of the
+   form, e.g. `/preview/my-headline/`). A bronze bar says it's a preview.
+8. To publish: switch **Draft** OFF and press **Save**.
 
 ## Photo map — where each photo goes
 
-| Box in the editor | Where it appears | Shape and minimum size |
+Every photo box has a **Show this photo** tick (untick to leave it out without
+deleting it) and **Keep this part in view when cropped** (Centre, Top, Bottom,
+Left, Right — e.g. Top for a face). No photo is required.
+
+| Box | Where it appears | Shape and minimum size |
 |---|---|---|
-| Photo 1 of 5 — Main photo (**required**) | Top of the article, full width. Also used for the story on the homepage, cropped to fit | Landscape 16:9 · 1600 × 900 px |
-| Photo 2 of 5 | After the 2nd paragraph | Landscape 3:2 · 1200 × 800 px |
-| Photo 3 of 5 | Middle of the article, LEFT of a side-by-side pair | Portrait 4:5 · 800 × 1000 px |
-| Photo 4 of 5 | Middle of the article, RIGHT of the pair | Portrait 4:5 · 800 × 1000 px |
-| Photo 5 of 5 | Before the last paragraph | Landscape 3:2 · 1200 × 800 px |
-| Instagram post | Straight after the photo pair | Paste the Embed code from Instagram |
-| Pull quote | Just before the photo pair | Short text |
+| Photo 1 — Main photo | Top of the article, full width. Also the story's picture on the homepage | Landscape 16:9 · 1600 × 900 px |
+| Photo 2 | After the 2nd paragraph | Landscape 3:2 · 1200 × 800 px |
+| Photo 3 | After the 4th paragraph | Landscape 3:2 · 1200 × 800 px |
+| Photo 4 | After the 6th paragraph, LEFT of a side-by-side pair | Portrait 4:5 · 800 × 1000 px |
+| Photo 5 | After the 6th paragraph, RIGHT of the pair | Portrait 4:5 · 800 × 1000 px |
+| Photo 6 | After the 8th paragraph | Landscape 3:2 · 1200 × 800 px |
+| Photo 7 | Before the last paragraph | Landscape 3:2 · 1200 × 800 px |
+| Pull quote | Just before the pair (after the 6th paragraph) | Short text |
+| Instagram post | Straight after the pair | Paste the Embed code from Instagram |
+| Newsletter box | After the 5th paragraph (automatic) | — |
 | CEO portrait (in **CEOs**) | CEO Spotlight on the homepage | Portrait 4:5 · 800 × 1000 px |
-| Video cover picture (in **Videos**) | Video block on the homepage | Landscape 16:9 · 1200 × 675 px |
 
-Empty boxes are simply skipped — an article needs only Photo 1.
-
-Keep the important part of Photo 1 near the centre: the homepage crops it to a
-tall shape in the picture section and a square in the grey feature band.
+Paragraphs are counted without sub-headings. In a short article, anything
+there's no room for goes at the end, in order.
 
 ## Run the homepage
 
 Click **Homepage**:
 
 - **Main story** and **Three stories beside the main story** — pick them.
-- Every other section has a **Show** switch. Switch it off to hide the whole
-  section. Nothing is deleted; switch it back on any time.
-- **Picture section** and **List section** fill themselves with the newest
-  stories from the section you choose.
-- **Feature band** — you write the heading and description, and pick three stories.
+- **Sections, top to bottom** — drag the ⠿ handle to move a section up or
+  down. Open a section to change its heading, which section it takes stories
+  from, its **Layout** (Grid, Pictures, Grey band, List), or to switch it off.
+  **+** adds a section; the bin removes it.
 
-## Hide or rename a menu tab
+## Menu bar
 
-Click **Sections & menu**, open the section, and switch **Show in the menu**
-off. Its articles stay online. *Position in the menu* sets the order.
+**Sections & menu** → open a section → **Show in the menu bar** on/off, and
+**Position in the menu** for the order.
 
-## Footer emails and social links
+## Site settings
 
-Click **Footer & contact**. Leave a social link empty to hide its icon.
+Logo for the menu bar · search icon on/off · Mailchimp sign-up address ·
+footer line, emails and social links.
 
 ---
 

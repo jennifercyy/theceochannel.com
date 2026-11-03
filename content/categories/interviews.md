@@ -1,7 +1,7 @@
 ---
-name: "Interviews"
+name: Interviews
 showInMenu: true
 order: 1
-parent: "content/categories/ceo-spotlight.md"
+description: Long-form conversations with the people who run the region's companies.
 ---
 

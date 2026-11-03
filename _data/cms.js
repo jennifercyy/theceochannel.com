@@ -39,52 +39,69 @@ function formatDate(iso, withTime) {
   return new Date(iso).toLocaleString("en-SG", opts).replace(" at ", ", ").replace("am", "AM").replace("pm", "PM");
 }
 
+// "Keep this part in view" → CSS object-position
+const FOCUS = { center: "50% 50%", top: "50% 0%", bottom: "50% 100%", left: "0% 50%", right: "100% 50%" };
+
+// A photo counts only if it has a picture AND "Show this photo" isn't unticked.
+function usable(p) {
+  if (!p || !p.src || p.show === false) return null;
+  return { ...p, position: FOCUS[p.focus] || FOCUS.center };
+}
+
 // Split the article text into blocks (paragraphs and headings) and
-// slot the photos in between, at the places the editor promises:
-//   Photo 2            after the 2nd paragraph
-//   Pull quote,
-//   Photos 3 + 4,
-//   Instagram post     about halfway through
-//   Photo 5            before the last paragraph
-function buildBody(article) {
-  const blocks = article.bodyMarkdown
+// slot photos and the newsletter box in between, at the places the
+// editor promises. "After paragraph N" counts paragraphs only, not
+// sub-headings.
+//   Photo 2              after paragraph 2
+//   Photo 3              after paragraph 4
+//   Newsletter box       after paragraph 5
+//   Pull quote, Photos 4 + 5 (pair), Instagram   after paragraph 6
+//   Photo 6              after paragraph 8
+//   Photo 7              before the last paragraph
+// Anything a short article has no room for goes at the end, in order.
+function buildBody(a) {
+  const blocks = a.bodyMarkdown
     .split(/\n\s*\n/)
     .map((b) => b.trim())
     .filter(Boolean)
     .map((b) => ({ type: "html", html: markdown.render(b) }));
 
-  const paragraphsSeen = (i) =>
-    blocks.slice(0, i + 1).filter((b) => b.html.startsWith("<p")).length;
+  const p = (n) => usable(a[`photo${n}`]);
+  const slots = [
+    { after: 2, items: [p(2) && { type: "photo", photo: p(2) }] },
+    { after: 4, items: [p(3) && { type: "photo", photo: p(3) }] },
+    { after: 5, items: [{ type: "newsletter" }] },
+    {
+      after: 6,
+      items: [
+        a.pullQuote && { type: "quote", text: a.pullQuote },
+        (p(4) || p(5)) && { type: "pair", left: p(4), right: p(5) },
+        a.instagramEmbed && { type: "instagram", html: a.instagramEmbed },
+      ],
+    },
+    { after: 8, items: [p(6) && { type: "photo", photo: p(6) }] },
+  ].map((s) => ({ ...s, items: s.items.filter(Boolean), placed: false }));
+  const last = p(7) && { type: "photo", photo: p(7) };
+  let lastPlaced = false;
 
-  const has = (p) => p && p.src;
   const parts = [];
-  let placedTwo = false, placedMiddle = false;
-  const middle = Math.floor(blocks.length / 2);
-  const last = blocks.length - 1;
-
+  let paragraphs = 0;
   blocks.forEach((block, i) => {
-    if (i === last && blocks.length > 1 && has(article.photo5)) parts.push({ type: "photo", photo: article.photo5, n: 5 });
-    if (i === middle && i > 0 && !placedMiddle) {
-      placedMiddle = true;
-      if (article.pullQuote) parts.push({ type: "quote", text: article.pullQuote });
-      if (has(article.photo3) || has(article.photo4)) parts.push({ type: "pair", left: article.photo3, right: article.photo4 });
-      if (article.instagramEmbed) parts.push({ type: "instagram", html: article.instagramEmbed });
+    const isLast = i === blocks.length - 1;
+    if (isLast && last && blocks.length > 1) {
+      // Anything still waiting goes before Photo 7, then Photo 7
+      for (const s of slots) if (!s.placed) { parts.push(...s.items); s.placed = true; }
+      parts.push(last);
+      lastPlaced = true;
     }
     parts.push(block);
-    if (!placedTwo && paragraphsSeen(i) === 2 && block.html.startsWith("<p")) {
-      placedTwo = true;
-      if (has(article.photo2)) parts.push({ type: "photo", photo: article.photo2, n: 2 });
+    if (block.html.startsWith("<p")) {
+      paragraphs++;
+      for (const s of slots) if (!s.placed && s.after === paragraphs) { parts.push(...s.items); s.placed = true; }
     }
   });
-
-  // Very short articles: anything not yet placed goes at the end.
-  if (!placedTwo && has(article.photo2)) parts.push({ type: "photo", photo: article.photo2, n: 2 });
-  if (!placedMiddle) {
-    if (article.pullQuote) parts.push({ type: "quote", text: article.pullQuote });
-    if (has(article.photo3) || has(article.photo4)) parts.push({ type: "pair", left: article.photo3, right: article.photo4 });
-    if (article.instagramEmbed) parts.push({ type: "instagram", html: article.instagramEmbed });
-  }
-  if (blocks.length <= 1 && has(article.photo5)) parts.push({ type: "photo", photo: article.photo5, n: 5 });
+  for (const s of slots) if (!s.placed) parts.push(...s.items);
+  if (last && !lastPlaced) parts.push(last);
   return parts;
 }
 
@@ -97,75 +114,68 @@ module.exports = function () {
   const homepage = readJson("homepage");
   const site = readJson("site");
 
-  // ---------- Sections and menu ----------
-  for (const c of Object.values(categories)) {
-    c.url = `/section/${c.slug}/`;
-    c.parentCat = c.parent ? categories[c.parent] : null;
-  }
+  // ---------- Sections and menu (no drop-downs) ----------
+  for (const c of Object.values(categories)) c.url = `/section/${c.slug}/`;
   const byOrder = (a, b) => (a.order || 99) - (b.order || 99);
   const menu = Object.values(categories)
-    .filter((c) => !c.parent && c.showInMenu !== false)
+    .filter((c) => c.showInMenu !== false)
     .sort(byOrder)
-    .map((c) => ({
-      ...c,
-      children: Object.values(categories)
-        .filter((s) => s.parent === c.key && s.showInMenu !== false)
-        .sort(byOrder),
-    }));
+    .map((c) => ({ name: c.name, slug: c.slug, url: c.url }));
 
-  // The top-level section a category belongs to (Succession → Leadership)
-  const topOf = (cat) => (cat && cat.parentCat ? cat.parentCat.name : cat && cat.name);
-
-  // ---------- Articles ----------
-  const articles = Object.values(allArticles)
-    .filter((a) => a.draft !== true)
-    .sort((a, b) => new Date(b.publishedDate) - new Date(a.publishedDate));
-
-  // Tina may save dates with or without quotes; make them all the same
+  // ---------- Articles (published and drafts) ----------
   const iso = (d) => (d ? new Date(d).toISOString() : "");
-  for (const a of articles) {
+  const everything = Object.values(allArticles).sort(
+    (a, b) => new Date(b.publishedDate) - new Date(a.publishedDate)
+  );
+  for (const a of everything) {
     a.publishedDate = iso(a.publishedDate);
     a.updatedDate = iso(a.updatedDate);
-    a.url = `/articles/${a.slug}/`;
+    a.isDraft = a.draft === true;
+    a.url = a.isDraft ? `/preview/${a.slug}/` : `/articles/${a.slug}/`;
     a.cat = categories[a.category] || { name: "", url: "/" };
-    a.topCat = topOf(a.cat);
+    a.sectionKeys = [a.category, ...(a.alsoIn || []).map((x) => x.category)].filter(Boolean);
     a.authorInfo = authors[a.author] || null;
     a.date = formatDate(a.publishedDate);
     a.publishedText = formatDate(a.publishedDate, true);
     a.updatedText = formatDate(a.updatedDate, true);
-    a.image = a.photo1 && a.photo1.src ? a.photo1.src : "";
-    a.ceoList = (a.relatedCEO || []).map((r) => ceos[r.ceo]).filter(Boolean);
+    a.lead = usable(a.photo1);
+    a.image = a.lead ? a.lead.src : "";
+    a.imagePosition = a.lead ? a.lead.position : FOCUS.center;
+    a.ceoList = (a.relatedCEO || []).map((r) => ceos[r.ceo]).filter(Boolean)
+      .map((c) => ({ name: c.name, role: c.role, companyName: c.companyName }));
+    a.keywords = (a.tags || []).filter(Boolean);
     a.parts = buildBody(a);
     a.label = a.sponsored ? `Partner content${a.sponsorName ? " · " + a.sponsorName : ""}` : a.cat.name;
   }
+  const articles = everything.filter((a) => !a.isDraft); // what the public sees
+
   // Short version of an article, used wherever one story links to
   // another (so the data never loops back on itself).
   const summary = (a) => a && ({
-    url: a.url, title: a.title, excerpt: a.excerpt, image: a.image, date: a.date,
-    label: a.label, sponsored: a.sponsored, format: a.format, storyLabel: a.storyLabel,
-    cat: { name: a.cat.name }, photo1: a.photo1,
+    url: a.url, title: a.title, excerpt: a.excerpt, image: a.image, imagePosition: a.imagePosition,
+    date: a.date, label: a.label, sponsored: a.sponsored, format: a.format, storyLabel: a.storyLabel,
+    cat: { name: a.cat.name },
   });
-  const bySlug = Object.fromEntries(articles.map((a) => [a.key, a]));
-  const inCategory = (catKey) =>
-    articles.filter((a) => a.category === catKey || (a.cat.parent === catKey));
+  const byKey = Object.fromEntries(articles.map((a) => [a.key, a]));
+  const inSection = (catKey) => articles.filter((a) => a.sectionKeys.includes(catKey));
 
-  // Up next + related, for each article
-  articles.forEach((a, i) => {
-    let next = bySlug[a.nextArticle] || articles[i + 1] || articles[0];
+  // Up next + related (used for "Related" and "Recommended")
+  for (const a of everything) {
+    const i = articles.indexOf(a);
+    let next = byKey[a.nextArticle] || articles[i + 1] || articles[0];
     if (next === a) next = null;
-    a.upNextFull = next;
     const others = articles.filter((o) => o !== a && o !== next);
-    const shared = (o) => (o.tags || []).some((t) => (a.tags || []).includes(t));
-    const score = (o) =>
-      (shared(o) ? 4 : 0) + (o.format === "Listicle" ? 2 : 0) + (o.topCat === a.topCat ? 1 : 0);
+    const shared = (o) => (o.keywords || []).some((t) => a.keywords.includes(t));
+    const sameSection = (o) => o.sectionKeys.some((k) => a.sectionKeys.includes(k));
+    const score = (o) => (shared(o) ? 4 : 0) + (o.format === "Listicle" ? 2 : 0) + (sameSection(o) ? 1 : 0);
     a.related = others
       .map((o, idx) => ({ o, s: score(o), idx }))
       .sort((x, y) => y.s - x.s || x.idx - y.idx)
-      .slice(0, 5)
+      .slice(0, 8)
       .map((x) => summary(x.o));
-  });
-  for (const a of articles) { a.upNext = summary(a.upNextFull); delete a.upNextFull; }
-  for (const a of articles) a.ceoList = a.ceoList.map((c) => ({ name: c.name, role: c.role, companyName: c.companyName }));
+    a.upNextSummary = summary(next);
+  }
+  for (const a of everything) a.upNext = a.upNextSummary;
 
   // ---------- CEOs: attach their stories ----------
   for (const c of Object.values(ceos)) {
@@ -174,41 +184,39 @@ module.exports = function () {
   }
 
   // ---------- Homepage ----------
-  const pick = (list) => (list || []).map((x) => summary(bySlug[x.article])).filter(Boolean);
   const h = homepage;
+  const COUNT = { grid: 3, pictures: 4, band: 3, list: 4 };
+  const sections = (h.sections || [])
+    .filter((s) => s.show !== false)
+    .map((s) => {
+      if (s._template === "stories") {
+        const cat = categories[s.category];
+        const layout = s.layout || "grid";
+        return {
+          type: "stories", layout, heading: s.heading || (cat && cat.name) || "",
+          description: cat && cat.description, moreUrl: cat && cat.url,
+          items: inSection(s.category).slice(0, COUNT[layout] || 3).map(summary),
+        };
+      }
+      if (s._template === "spotlight")
+        return { type: "spotlight", heading: s.heading || "CEO Spotlight", intro: s.intro, items: (s.ceos || []).map((x) => ceos[x.ceo]).filter(Boolean) };
+      if (s._template === "video") return { type: "video", item: videos[s.video] };
+      if (s._template === "newsletter") return { type: "newsletter" };
+      return null;
+    })
+    .filter((s) => s && (s.type !== "stories" || s.items.length) && (s.type !== "spotlight" || s.items.length) && (s.type !== "video" || s.item));
+
   const home = {
-    lead: summary(bySlug[h.leadStory]),
-    secondary: pick(h.secondaryStories).slice(0, 3),
-    latestInterviews: { show: h.latestInterviews?.show !== false, items: articles.filter((a) => a.format === "Interview").slice(0, 3).map(summary) },
-    spotlight: { ...h.spotlight, show: h.spotlight?.show !== false, items: (h.spotlight?.ceos || []).map((x) => ceos[x.ceo]).filter(Boolean) },
-    photoSection: {
-      ...h.photoSection,
-      show: h.photoSection?.show !== false,
-      cat: categories[h.photoSection?.category],
-      items: inCategory(h.photoSection?.category).slice(0, 4).map(summary),
-    },
-    video: { show: h.video?.show !== false, item: videos[h.video?.video] },
-    featureBand: {
-      ...h.featureBand,
-      show: h.featureBand?.show !== false,
-      viewAllCat: categories[h.featureBand?.viewAll],
-      items: pick(h.featureBand?.articles).slice(0, 3),
-    },
-    insights: {
-      ...h.insights,
-      show: h.insights?.show !== false,
-      cat: categories[h.insights?.category],
-      items: inCategory(h.insights?.category).slice(0, 4).map(summary),
-    },
-    newsletter: { show: h.newsletter?.show !== false },
+    lead: summary(byKey[h.leadStory]),
+    secondary: (h.secondaryStories || []).map((x) => summary(byKey[x.article])).filter(Boolean).slice(0, 3),
+    sections,
   };
 
   // ---------- Section pages ----------
-  const sections = Object.values(categories).map((c) => ({
-    ...c,
-    parentCat: undefined,
-    items: inCategory(c.key).map(summary),
+  const sectionPages = Object.values(categories).map((c) => ({
+    name: c.name, slug: c.slug, url: c.url, description: c.description,
+    items: inSection(c.key).map(summary),
   }));
 
-  return { articles, menu, sections, home, site, formatDate };
+  return { articles, everything, menu, sections: sectionPages, home, site, formatDate };
 };

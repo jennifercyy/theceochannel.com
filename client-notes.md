@@ -5,6 +5,43 @@ Newest first. Jamie Nonis uses they/them.
 
 ---
 
+## 3 Nov 2026 — second round of client changes
+
+Built and live
+- Homepage sections can be dragged into any order in the editor; each has a
+  layout choice and an on/off switch. Order set to Interviews → Leadership →
+  C-Suites → Exec Lifestyle (replaces Insights) → Power Up → Newsletter.
+- Removed: Partner content video block; Lists & rankings band.
+- Section headings in CAPS; every "See all / View all" is now "More".
+- Menu bar: navy, INTERVIEWS · C-SUITES · POWER UP · EXEC LIFESTYLE, no
+  drop-downs, SUBSCRIBE button (pop-up "Sharpen your game"), search icon.
+- Search built (Pagefind, free, no server); on/off switch in Site settings.
+- Articles: 7 photo spaces, each with a Show tick and a "keep in view" focus
+  point; no photo required; draft preview at /preview/<name>/; centred,
+  wider header; Related with thumbnails under the main photo; newsletter box
+  in the text; Keywords under the article; share icons in brand colours;
+  "Add The CEO Channel on Google"; "Recommended" replaces "More to read";
+  "Also show in" sections.
+- Footer line: "Sharpening your game".
+
+Waiting on the client
+- Logo file (slot ready in Site settings) and navy hex (interim #14213D).
+- Mailchimp account + embedded form address (sign-ups show "coming soon"
+  until then).
+- Leadership: on the homepage but not in the menu list — confirm.
+- CEO Spotlight: not in the new order — switched off; confirm keep or drop.
+- Pop-up says "Sharpen your game", footer says "Sharpening your game" —
+  confirm both wordings are intended.
+
+Scope notes
+- Search delivered as goodwill (no charge), per 2 Nov discussion.
+- Direct CRM integration remains out of scope; Mailchimp's own integrations
+  can pass subscribers on to a CRM.
+- Photo cropping/dragging inside the editor isn't available in Tina; the
+  focus-point setting is the substitute.
+
+---
+
 ## 2 Nov 2026 (afternoon) — editing system, first version
 
 Decisions

@@ -1,57 +1,54 @@
+{% from "partials/subscribe.njk" import subscribeForm %}
+{% set s = cms.site %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ pageTitle or "The CEO Channel — Business & leadership journalism" }}</title>
-  <meta name="description" content="{{ pageDescription or 'Interviews, leadership and insight for the people who run companies. The CEO Channel.' }}" />
+  <title>{{ pageTitle or "The CEO Channel — Sharpening your game" }}</title>
+  <meta name="description" content="{{ pageDescription or 'Interviews, insights and industry opinions for the people who run companies. The CEO Channel.' }}" />
   {% if pageImage %}<meta property="og:image" content="{{ pageImage }}" />{% endif %}
+  {% if noIndex == "true" %}<meta name="robots" content="noindex, nofollow" />{% endif %}
 
   <!-- Google Fonts: Newsreader (display) + Inter (body/UI) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Newsreader:wght@500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:wght@500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/styles.css" />
+  {% if s.searchEnabled %}<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />{% endif %}
 </head>
 <body>
 
   <!-- ============================================================
-       NAVIGATION — built from “Sections & menu” in the editor.
-       Sections switched off there do not appear here.
+       MENU BAR — navy. Logo (or the words, until a logo is
+       uploaded), the sections switched on in “Sections & menu”,
+       then SUBSCRIBE and search. No drop-downs.
        ============================================================ -->
   <header class="nav" id="nav">
     <div class="nav__inner">
-      <a class="nav__wordmark" href="/">The CEO Channel</a>
+      <a class="nav__wordmark" href="/">
+        {% if s.logo %}<img class="nav__logo" src="{{ s.logo }}" alt="The CEO Channel" />{% else %}The CEO Channel{% endif %}
+      </a>
 
       <button class="nav__toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
         <span></span><span></span><span></span>
       </button>
 
       <nav class="nav__links" id="nav-links" aria-label="Sections">
-        {% for section in cms.menu %}
-        <div class="menu">
-          {% if section.children.length %}
-          <button class="menu__btn" aria-expanded="false" aria-controls="menu-{{ section.slug }}">{{ section.name }}
-            <svg class="menu__chev" viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4l4 4 4-4"/></svg>
-          </button>
-          <ul class="menu__panel" id="menu-{{ section.slug }}" hidden>
-            <li><a class="menu__all" href="{{ section.url }}">All {{ section.name }}</a></li>
-            {% for sub in section.children %}<li><a href="{{ sub.url }}">{{ sub.name }}</a></li>{% endfor %}
-          </ul>
-          {% else %}
-          <a class="menu__btn" href="{{ section.url }}">{{ section.name }}</a>
-          {% endif %}
-        </div>
-        {% endfor %}
+        {% for section in cms.menu %}<a class="nav__link" href="{{ section.url }}">{{ section.name }}</a>{% endfor %}
       </nav>
 
-      <button class="nav__search" aria-label="Search">
+      <button class="nav__subscribe" type="button" data-open="subscribe-dialog">Subscribe</button>
+
+      {% if s.searchEnabled %}
+      <button class="nav__search" type="button" aria-label="Search" data-open="search-dialog">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6">
           <circle cx="11" cy="11" r="7" />
           <line x1="16.5" y1="16.5" x2="21" y2="21" />
         </svg>
       </button>
+      {% endif %}
     </div>
   </header>
 
@@ -60,10 +57,9 @@
   </main>
 
   <!-- ============================================================
-       FOOTER — contact details come from “Footer & contact”
-       in the editor. Empty social links hide their icon.
+       FOOTER — contact details come from “Site settings”.
+       Empty social links hide their icon.
        ============================================================ -->
-  {% set s = cms.site %}
   <footer class="footer" id="footer">
     <div class="wrap">
       <div class="footer__top">
@@ -90,7 +86,7 @@
           <ul>
             <li><a href="#">About us</a></li>
             <li><a href="#">Partner with us</a></li>
-            <li><a href="#">Newsletter</a></li>
+            <li><a href="#" data-open="subscribe-dialog">Newsletter</a></li>
           </ul>
         </div>
 
@@ -110,6 +106,25 @@
       </div>
     </div>
   </footer>
+
+  <!-- ============================================================
+       SUBSCRIBE POP-UP — opened by the SUBSCRIBE button
+       ============================================================ -->
+  <dialog class="modal" id="subscribe-dialog" aria-labelledby="subscribe-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">×</button>
+    <h2 class="modal__title" id="subscribe-title">Sharpen your game</h2>
+    <p class="modal__text">Subscribe to our newsletter for the latest interviews, insights and industry opinions delivered straight to your inbox.</p>
+    {{ subscribeForm(s, "popup") }}
+  </dialog>
+
+  {% if s.searchEnabled %}
+  <!-- SEARCH — results come from the site's own search index -->
+  <dialog class="modal modal--search" id="search-dialog" aria-label="Search">
+    <button class="modal__close" type="button" data-close aria-label="Close">×</button>
+    <div id="search"></div>
+  </dialog>
+  <script src="/pagefind/pagefind-ui.js"></script>
+  {% endif %}
 
   <script src="/site.js"></script>
 </body>

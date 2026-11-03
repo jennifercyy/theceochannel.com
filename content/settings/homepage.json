@@ -11,59 +11,65 @@
       "article": "content/articles/five-questions-board-ai.md"
     }
   ],
-  "latestInterviews": {
-    "show": true
-  },
-  "spotlight": {
-    "show": true,
-    "intro": "The leaders we return to — every interview, profile and follow-up in one place.",
-    "ceos": [
-      {
-        "ceo": "content/ceos/mireille-sarawak.md"
-      },
-      {
-        "ceo": "content/ceos/arun-balakrishnan.md"
-      },
-      {
-        "ceo": "content/ceos/grace-tan.md"
-      },
-      {
-        "ceo": "content/ceos/daniel-wong.md"
-      }
-    ]
-  },
-  "photoSection": {
-    "show": true,
-    "heading": "Leadership",
-    "category": "content/categories/leadership.md"
-  },
-  "video": {
-    "show": true,
-    "video": "content/videos/treasury-floor.md"
-  },
-  "featureBand": {
-    "show": true,
-    "heading": "Lists & rankings",
-    "description": "The shortlists the region’s boardrooms read: who to watch, what to ask, and what the best leaders do differently.",
-    "viewAll": "content/categories/lists-rankings.md",
-    "articles": [
-      {
-        "article": "content/articles/ten-cfos-to-watch-2027.md"
-      },
-      {
-        "article": "content/articles/seven-habits-longest-serving-ceos.md"
-      },
-      {
-        "article": "content/articles/five-questions-board-ai.md"
-      }
-    ]
-  },
-  "insights": {
-    "show": true,
-    "heading": "Insights",
-    "category": "content/categories/insights.md"
-  },
-  "newsletter": {
-    "show": true
-  }
+  "sections": [
+    {
+      "_template": "stories",
+      "show": true,
+      "heading": "Interviews",
+      "category": "content/categories/interviews.md",
+      "layout": "grid"
+    },
+    {
+      "_template": "stories",
+      "show": true,
+      "heading": "Leadership",
+      "category": "content/categories/leadership.md",
+      "layout": "pictures"
+    },
+    {
+      "_template": "stories",
+      "show": true,
+      "heading": "C-Suites",
+      "category": "content/categories/c-suites.md",
+      "layout": "band"
+    },
+    {
+      "_template": "stories",
+      "show": true,
+      "heading": "Exec Lifestyle",
+      "category": "content/categories/exec-lifestyle.md",
+      "layout": "list"
+    },
+    {
+      "_template": "stories",
+      "show": true,
+      "heading": "Power Up",
+      "category": "content/categories/power-up.md",
+      "layout": "grid"
+    },
+    {
+      "_template": "spotlight",
+      "show": false,
+      "heading": "CEO Spotlight",
+      "intro": "The leaders we return to — every interview, profile and follow-up in one place.",
+      "ceos": [
+        {
+          "ceo": "content/ceos/mireille-sarawak.md"
+        },
+        {
+          "ceo": "content/ceos/arun-balakrishnan.md"
+        },
+        {
+          "ceo": "content/ceos/grace-tan.md"
+        },
+        {
+          "ceo": "content/ceos/daniel-wong.md"
+        }
+      ]
+    },
+    {
+      "_template": "newsletter",
+      "show": true
+    }
+  ]
 }

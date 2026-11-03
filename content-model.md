@@ -7,6 +7,14 @@ exist means rewriting files by hand. Get it right once.
 
 Each collection below becomes a folder of Markdown files in `/content/`.
 
+> **Revision 4 — 3 Nov 2026.** Sections are now Interviews · C-Suites · Power Up ·
+> Exec Lifestyle (menu) + Leadership (homepage only); no sub-sections or
+> drop-downs. Homepage sections are a drag-to-reorder list. Seven photos per
+> article, each with a Show tick and a focus point; Photo 1 no longer required.
+> Articles can appear in extra sections ("Also show in"). Keywords (tags)
+> shown under articles. Drafts are built at /preview/<name>/. Site settings
+> gain logo, search on/off and Mailchimp address.
+>
 > **Revision 3 — 2 Nov 2026.** Built in Tina (`tina/config.ts`). Signature
 > series removed (client does not want it). Every homepage section and every
 > menu tab now has an on/off switch. Photos 1–5 have fixed positions (see
@@ -26,7 +34,18 @@ field below. Nothing on a page is typed in by hand.
 
 | On the site | Comes from |
 |---|---|
-| Menu (sections + drop-down sub-sections) | Categories (`parent` field) |
+| Menu bar | Categories with showInMenu on, by `order` |
+| Homepage lead story + 3 secondary stories | Homepage settings |
+| Homepage sections, in order | Homepage settings → `sections` blocks |
+| Article: Related (4, under main photo) | Related rule |
+| Article: Up next | `nextArticle` if set, otherwise the next-newest article |
+| Article: Recommended (4) | Related rule, next four |
+| Article: Keywords | `tags` |
+| Sign-up forms (pop-up, homepage, in article) | Site settings → `mailchimpFormUrl` |
+| Footer | Site settings |
+
+---|---|
+| Menu bar | Categories with showInMenu on, by order |
 | Homepage lead story + 3 secondary stories | Homepage settings |
 | Latest interviews | Newest 3 articles with format = Interview |
 | CEO Spotlight | Homepage settings → chosen CEOs; each shows their linked articles |
@@ -50,15 +69,16 @@ field below. Nothing on a page is typed in by hand.
 | excerpt | long text | yes | Standfirst. Shown under the headline and on cards |
 | format | choice | yes | **NEW.** Interview · Profile · Column · Listicle · News. Drives "Latest interviews" and the Related rule |
 | storyLabel | text | no | **NEW.** Short label shown in CEO Spotlight, e.g. "Follow-up", "Off the Record". Falls back to `format` |
-| photo1 | {src, alt, caption, credit} | yes | Photo 1 of 5. Top of article + homepage. Landscape 16:9, min 1600 × 900 |
+| photo1 … photo7 | {show, src, focus, alt, caption, credit} | no | **CHANGED (rev 4).** `show` tick hides a photo without deleting it; `focus` = center/top/bottom/left/right (what stays in view when cropped). Positions: 1 top of article + homepage; 2 after paragraph 2; 3 after paragraph 4; 4 + 5 side-by-side pair after paragraph 6; 6 after paragraph 8; 7 before the last paragraph |
+| draft | boolean | no | On = hidden from the site; built at /preview/<name>/ for checking |
 | draft | boolean | no | **NEW (rev 3).** On = hidden from the site |
-| photo2 … photo5 | {src, alt, caption, credit} | no | **CHANGED (rev 3).** Fixed positions: 2 after paragraph 2 (3:2); 3 + 4 side-by-side pair mid-article (4:5); 5 before the last paragraph (3:2) |
 | instagramEmbed | long text | no | **NEW.** Paste Instagram's Embed code (post → ••• → Embed). Used when there are no press photos |
 | pullQuote | text | no | **CHANGED.** Was part of the body; now a separate optional field so it can be switched off site-wide **[confirm: keep pull quotes?]** |
 | body | rich text | yes | Headings, paragraphs, links. Photos and embeds are placed automatically between paragraphs |
 | author | reference → Author | yes | Shown on the article page only, never on the homepage |
-| category | reference → Category | yes | One only. Pick a sub-category where one exists |
-| tags | list of words | no | Used by the Related rule |
+| category | reference → Category | yes | Main section, shown as the label |
+| alsoIn | list of {category} | no | **NEW (rev 4).** Extra sections the article also appears in |
+| tags | list of words | no | Shown as **Keywords** under the article; used by Related / Recommended |
 | publishedDate | date + time | yes | **CHANGED.** Now includes time |
 | updatedDate | date + time | no | **NEW.** Shown as "Updated …" when filled in |
 | relatedCEO | list of references → CEO | no | **CHANGED.** Now a list. An article can be about more than one leader. This is what fills each CEO's story list in CEO Spotlight |
@@ -148,58 +168,57 @@ Removed from revision 1: `featured` (moved to Homepage settings).
 |---|---|---|---|
 | name | text | yes | |
 | slug | text | yes | |
-| showInMenu | boolean | no | **NEW (rev 3).** Off = tab hidden from menu; articles stay online |
-| description | text | no | |
-| parent | reference → Category | no | **NEW.** Empty = top-level menu section. Filled = sub-section in that section's drop-down |
-| order | number | no | **NEW.** Order in the menu |
+| showInMenu | boolean | no | Off = not on the menu bar; articles and homepage section stay |
+| order | number | no | Position on the menu bar |
+| description | text | no | Section page intro; also used by the grey band layout |
 
-Starting set — **[confirm with client; these are placeholders]**
+No sub-sections or drop-downs (removed rev 4).
 
-| Section (top level) | Sub-sections (drop-down) |
-|---|---|
-| CEO Spotlight | Interviews · Profiles |
-| Leadership | Boards & governance · Succession · Founders · Managing people |
-| Insights | Strategy · Markets · Lists & rankings |
-| Video | Interviews on camera · Partner content |
-
-"Industry" removed (client feedback, Oct 2026).
+| Section | In menu bar | Order |
+|---|---|---|
+| Interviews | yes | 1 |
+| C-Suites | yes | 2 |
+| Power Up | yes | 3 |
+| Exec Lifestyle | yes | 4 |
+| Leadership | no (homepage only) **[confirm]** | 5 |
 
 ---
 
-## Homepage settings — NEW
+## Homepage settings
 `/content/settings/homepage.json` — a single file, not a collection.
-Every section below the lead has a `show` switch (rev 3).
 
 | Field | Type | Notes |
 |---|---|---|
 | leadStory | reference → Article | Main story (big image + headline) |
 | secondaryStories | list of {article} | Exactly 3 |
-| latestInterviews | {show} | Fills itself: newest 3 with format = Interview |
-| spotlight | {show, intro, ceos: list of {ceo}} | 4 CEOs look best |
-| photoSection | {show, heading, category} | Tatler photo layout; newest 4 in category |
-| video | {show, video} | |
-| featureBand | {show, heading, description, viewAll (category), articles: list of {article}} | Grey panel; 3 articles |
-| insights | {show, heading, category} | List section; newest 4 in category |
-| newsletter | {show} | |
+| sections | **ordered list of blocks** (drag to reorder) | See below |
 
----|---|---|---|
-| leadStory | reference → Article | yes | Main story (big image + headline) |
-| secondaryStories | list of references → Article | yes | Exactly 3 |
-| spotlightCEOs | list of references → CEO | yes | 4, in display order |
-| spotlightIntro | text | no | Line under the CEO Spotlight heading |
-| featuredVideo | reference → Video | no | Hides the video block if empty |
+Block types (`_template`):
+
+| Block | Fields | Notes |
+|---|---|---|
+| stories | show, heading, category, layout | layout = grid (3) · pictures (Tatler, 4) · band (grey, 3) · list (4, with ad space). Newest stories whose main or "also show in" section matches |
+| spotlight | show, heading, intro, ceos | Dark CEO band |
+| video | show, video | |
+| newsletter | show | "Sharpen your game" sign-up |
+
+Default order (client, 3 Nov 2026): Interviews (grid) → Leadership (pictures) →
+C-Suites (band) → Exec Lifestyle (list) → Power Up (grid) → CEO Spotlight
+(hidden **[confirm]**) → Newsletter. Partner-content video and Lists & rankings
+band removed.
 
 ---
 
-## Site settings — NEW
+## Site settings
 `/content/settings/site.json` — a single file.
 
 | Field | Type | Notes |
 |---|---|---|
-| tagline | text | Footer line |
-| editorialEmail | email | Footer only |
-| partnershipsEmail | email | Footer only |
-| generalEmail | email | Footer only |
+| logo | image | Menu bar logo; empty = THE CEO CHANNEL wordmark |
+| searchEnabled | boolean | Shows/hides the search icon |
+| mailchimpFormUrl | url | Mailchimp embedded-form action address; empty = "coming soon" message |
+| tagline | text | Footer line ("Sharpening your game") |
+| editorialEmail · partnershipsEmail · generalEmail | email | Footer only |
 | linkedin · instagram · youtube · x | url | Footer social icons; empty = icon hidden |
 
 ---

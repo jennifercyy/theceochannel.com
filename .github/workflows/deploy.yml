@@ -48,6 +48,8 @@ jobs:
           GITHUB_BRANCH: main
       - name: Build the website pages
         run: npx eleventy
+      - name: Build the search index
+        run: npx pagefind --site _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -1,5 +1,8 @@
 {
-  "tagline": "Interviews and insight for the people who run companies. Singapore.",
+  "logo": "",
+  "searchEnabled": true,
+  "mailchimpFormUrl": "",
+  "tagline": "Sharpening your game",
   "editorialEmail": "editor@theceochannel.com",
   "partnershipsEmail": "partners@theceochannel.com",
   "generalEmail": "hello@theceochannel.com",

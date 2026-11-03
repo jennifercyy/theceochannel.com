@@ -4,26 +4,36 @@ permalink: /index.html
 ---
 {#
   HOMEPAGE. Everything here is chosen in the editor under “Homepage”.
-  Each section has a “Show …” switch there; switched-off sections
-  are skipped below by the {% if … .show %} lines.
+  The sections are drawn in the order Jamie drags them into there;
+  hidden ones never reach this page.
 #}
+{% from "partials/subscribe.njk" import subscribeForm %}
 {% set h = cms.home %}
 
-    <!-- 1. LEAD STORIES (CNA format) — main story + three beside it -->
+{# A story's picture, if it has one. `ratio` is a media-- class. #}
+{% macro pic(a, ratio, w, ht) %}{% if a.image %}<a class="media media--{{ ratio }}" href="{{ a.url }}"><img src="{{ a.image }}" style="object-position: {{ a.imagePosition }}" width="{{ w }}" height="{{ ht }}" alt="" referrerpolicy="no-referrer" loading="lazy" /></a>{% endif %}{% endmacro %}
+{% macro label(a) %}<p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>{% endmacro %}
+{% macro head(sec) %}
+      <div class="section__head">
+        <h2 class="section__heading">{{ sec.heading }}</h2>
+        {% if sec.moreUrl %}<a class="section__more" href="{{ sec.moreUrl }}">More</a>{% endif %}
+      </div>
+{% endmacro %}
+
+    <!-- LEAD STORIES (CNA format) — main story + three beside it -->
     {% if h.lead %}
     <section class="wrap lead">
       <article class="lead__main">
-        <a class="media media--wide" href="{{ h.lead.url }}"><img src="{{ h.lead.image }}" width="1400" height="788" alt="{{ h.lead.photo1.alt }}" referrerpolicy="no-referrer" /></a>
-        <p class="{{ 'sponsored' if h.lead.sponsored else 'tag' }}">{{ h.lead.label }}</p>
+        {{ pic(h.lead, "wide", 1400, 788) }}
+        {{ label(h.lead) }}
         <h1 class="lead__headline"><a href="{{ h.lead.url }}">{{ h.lead.title }}</a></h1>
         <p class="lead__standfirst">{{ h.lead.excerpt }}</p>
       </article>
-
       <div class="lead__side">
         {% for a in h.secondary %}
         <article class="lead__side-item">
-          {% if loop.first and a.image %}<a class="media media--wide" href="{{ a.url }}"><img src="{{ a.image }}" width="700" height="394" alt="" referrerpolicy="no-referrer" /></a>{% endif %}
-          <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
+          {% if loop.first %}{{ pic(a, "wide", 700, 394) }}{% endif %}
+          {{ label(a) }}
           <h2 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h2>
         </article>
         {% endfor %}
@@ -31,37 +41,119 @@ permalink: /index.html
     </section>
     {% endif %}
 
-    <!-- 2. LATEST INTERVIEWS — newest three stories of type Interview -->
-    {% if h.latestInterviews.show %}
-    <section class="wrap section" id="interviews" style="padding-top:0">
-      <div class="section__head">
-        <h2 class="section__heading">Latest interviews</h2>
-      </div>
+{% for sec in h.sections %}
+
+  {% if sec.type == "stories" and sec.layout == "grid" %}
+    <!-- GRID — three cards in a row -->
+    <section class="wrap section">
+      {{ head(sec) }}
       <div class="grid grid--3">
-        {% for a in h.latestInterviews.items %}
+        {% for a in sec.items %}
         <article class="card">
-          <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="800" height="600" alt="" referrerpolicy="no-referrer" /></a>
-          <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
+          {{ pic(a, "card", 800, 600) }}
+          {{ label(a) }}
           <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
           <p class="meta">{{ a.date }}</p>
         </article>
         {% endfor %}
       </div>
     </section>
-    {% endif %}
 
-    <!-- 3. CEO SPOTLIGHT — dark band; each CEO lists their stories -->
-    {% if h.spotlight.show and h.spotlight.items.length %}
-    <section class="spotlight" id="spotlight">
-      <div class="wrap section">
-        <div class="section__head">
-          <h2 class="section__heading">CEO Spotlight</h2>
+  {% elif sec.type == "stories" and sec.layout == "pictures" %}
+    <!-- PICTURES — Tatler Homes photo placement:
+         one tall picture left; one wide + two small right -->
+    <section class="wrap section">
+      {{ head(sec) }}
+      <div class="tatler">
+        {% set a = sec.items[0] %}
+        <article class="tatler__tall">
+          {{ pic(a, "tall", 800, 1000) }}
+          {{ label(a) }}
+          <h3 class="tatler__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+          <p class="tatler__excerpt">{{ a.excerpt }}</p>
+        </article>
+        <div class="tatler__side">
+          {% if sec.items[1] %}{% set a = sec.items[1] %}
+          <article class="tatler__wide">
+            {{ pic(a, "wide", 800, 450) }}
+            {{ label(a) }}
+            <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+          </article>
+          {% endif %}
+          <div class="tatler__pair">
+            {% for a in sec.items.slice(2, 4) %}
+            <article class="tatler__small">
+              {{ pic(a, "card", 400, 300) }}
+              {{ label(a) }}
+              <h3 class="tatler__small-title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+            </article>
+            {% endfor %}
+          </div>
         </div>
-        {% if h.spotlight.intro %}<p class="spotlight__intro">{{ h.spotlight.intro }}</p>{% endif %}
+      </div>
+    </section>
+
+  {% elif sec.type == "stories" and sec.layout == "band" %}
+    <!-- GREY BAND (Tatler Homes Design Awards placement):
+         heading + description left, three picture rows right -->
+    <section class="wrap section">
+      <div class="feature-band">
+        <div class="feature-band__intro">
+          <h2 class="feature-band__heading">{{ sec.heading }}</h2>
+          <span class="feature-band__bar" aria-hidden="true"></span>
+          {% if sec.description %}<p>{{ sec.description }}</p>{% endif %}
+          {% if sec.moreUrl %}<a class="more-link more-link--left" href="{{ sec.moreUrl }}">More</a>{% endif %}
+        </div>
+        <ul class="feature-band__list">
+          {% for a in sec.items %}
+          <li>
+            {% if a.image %}{{ pic(a, "card", 300, 225) }}{% else %}<span></span>{% endif %}
+            <div>
+              {{ label(a) }}
+              <h3 class="tatler__small-title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+
+  {% elif sec.type == "stories" and sec.layout == "list" %}
+    <!-- LIST — thumbnail + text rows, ad space alongside -->
+    <section class="wrap section band">
+      <div>
+        {{ head(sec) }}
+        <ul class="rows">
+          {% for a in sec.items %}
+          <li>
+            {% if a.image %}{{ pic(a, "card", 500, 375) }}{% else %}<span></span>{% endif %}
+            <div>
+              {{ label(a) }}
+              <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
+              <p class="rows__excerpt">{{ a.excerpt }}</p>
+              <p class="meta">{{ a.date }}</p>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <aside class="band__aside">
+        <div class="ad ad--halfpage" role="complementary" aria-label="Advertisement">
+          <span class="ad__label">AD — HALF PAGE 300x600</span>
+        </div>
+      </aside>
+    </section>
+
+  {% elif sec.type == "spotlight" %}
+    <!-- CEO SPOTLIGHT — dark band; each CEO lists their stories -->
+    <section class="spotlight">
+      <div class="wrap section">
+        <div class="section__head"><h2 class="section__heading">{{ sec.heading }}</h2></div>
+        {% if sec.intro %}<p class="spotlight__intro">{{ sec.intro }}</p>{% endif %}
         <div class="grid grid--4">
-          {% for c in h.spotlight.items %}
+          {% for c in sec.items %}
           <article class="ceo">
-            <a class="media media--tall" href="{{ c.url }}"><img src="{{ c.portrait }}" width="600" height="750" alt="{{ c.name }}" referrerpolicy="no-referrer" /></a>
+            <a class="media media--tall" href="{{ c.url }}"><img src="{{ c.portrait }}" width="600" height="750" alt="{{ c.name }}" referrerpolicy="no-referrer" loading="lazy" /></a>
             <div>
               <h3 class="ceo__name"><a href="{{ c.url }}">{{ c.name }}</a></h3>
               <p class="ceo__role">{{ c.role }}, {{ c.companyName }}</p>
@@ -76,57 +168,14 @@ permalink: /index.html
         </div>
       </div>
     </section>
-    {% endif %}
 
-    <!-- 4. PICTURE SECTION — Tatler Homes photo placement:
-            one tall picture left; one wide + two small right -->
-    {% set ps = h.photoSection %}
-    {% if ps.show and ps.items.length %}
-    <section class="wrap section" id="pictures">
-      <div class="section__head">
-        <h2 class="section__heading">{{ ps.heading or ps.cat.name }}</h2>
-      </div>
-
-      <div class="tatler">
-        {% set a = ps.items[0] %}
-        <article class="tatler__tall">
-          <a class="media media--tall" href="{{ a.url }}"><img src="{{ a.image }}" width="800" height="1000" alt="" referrerpolicy="no-referrer" /></a>
-          <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
-          <h3 class="tatler__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
-          <p class="tatler__excerpt">{{ a.excerpt }}</p>
-        </article>
-
-        <div class="tatler__side">
-          {% if ps.items[1] %}{% set a = ps.items[1] %}
-          <article class="tatler__wide">
-            <a class="media media--wide" href="{{ a.url }}"><img src="{{ a.image }}" width="800" height="450" alt="" referrerpolicy="no-referrer" /></a>
-            <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
-            <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
-          </article>
-          {% endif %}
-          <div class="tatler__pair">
-            {% for a in ps.items.slice(2, 4) %}
-            <article class="tatler__small">
-              <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="400" height="300" alt="" referrerpolicy="no-referrer" /></a>
-              <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
-              <h3 class="tatler__small-title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
-            </article>
-            {% endfor %}
-          </div>
-        </div>
-      </div>
-
-      {% if ps.cat %}<a class="more-link" href="{{ ps.cat.url }}">More {{ (ps.heading or ps.cat.name) | lower }} →</a>{% endif %}
-    </section>
-    {% endif %}
-
-    <!-- 5. VIDEO / PARTNER CONTENT -->
-    {% set v = h.video.item %}
-    {% if h.video.show and v %}
-    <section class="partner-video" id="video">
+  {% elif sec.type == "video" %}
+    {% set v = sec.item %}
+    <!-- VIDEO -->
+    <section class="partner-video">
       <div class="wrap section partner-video__inner">
         <a class="video" href="{{ v.videoUrl or '#' }}" target="_blank" rel="noopener" aria-label="Play video">
-          <img src="{{ v.thumbnail }}" width="1200" height="675" alt="" referrerpolicy="no-referrer" />
+          <img src="{{ v.thumbnail }}" width="1200" height="675" alt="" referrerpolicy="no-referrer" loading="lazy" />
           <span class="video__play"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           {% if v.duration %}<span class="video__time">{{ v.duration }}</span>{% endif %}
         </a>
@@ -134,82 +183,19 @@ permalink: /index.html
           {% if v.sponsored %}<p class="sponsored">Partner content{% if v.sponsorName %} · {{ v.sponsorName }}{% endif %}</p>{% endif %}
           <h2 class="partner-video__title">{{ v.title }}</h2>
           <p>{{ v.description }}</p>
-          <a class="quiet-link" href="#footer">Partner with us</a>
         </div>
       </div>
     </section>
-    {% endif %}
 
-    <!-- 6. FEATURE BAND — grey panel (Tatler Homes Design Awards placement):
-            heading + description left, three stories with pictures right -->
-    {% set fb = h.featureBand %}
-    {% if fb.show and fb.items.length %}
-    <section class="wrap section" id="feature">
-      <div class="feature-band">
-        <div class="feature-band__intro">
-          <h2 class="feature-band__heading">{{ fb.heading }}</h2>
-          <span class="feature-band__bar" aria-hidden="true"></span>
-          <p>{{ fb.description }}</p>
-          {% if fb.viewAllCat %}<a class="more-link more-link--left" href="{{ fb.viewAllCat.url }}">View all →</a>{% endif %}
-        </div>
-        <ul class="feature-band__list">
-          {% for a in fb.items %}
-          <li>
-            <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="300" height="225" alt="" referrerpolicy="no-referrer" /></a>
-            <div>
-              <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
-              <h3 class="tatler__small-title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </section>
-    {% endif %}
-
-    <!-- 7. LIST SECTION — thumbnail + text rows, ad space alongside -->
-    {% set ins = h.insights %}
-    {% if ins.show and ins.items.length %}
-    <section class="wrap section band" id="insights">
-      <div>
-        <div class="section__head">
-          <h2 class="section__heading">{{ ins.heading or ins.cat.name }}</h2>
-          {% if ins.cat %}<a class="section__more" href="{{ ins.cat.url }}">See all</a>{% endif %}
-        </div>
-        <ul class="rows">
-          {% for a in ins.items %}
-          <li>
-            <a class="media media--card" href="{{ a.url }}"><img src="{{ a.image }}" width="500" height="375" alt="" referrerpolicy="no-referrer" /></a>
-            <div>
-              <p class="{{ 'sponsored' if a.sponsored else 'tag' }}">{{ a.label }}</p>
-              <h3 class="card__title"><a href="{{ a.url }}">{{ a.title }}</a></h3>
-              <p class="rows__excerpt">{{ a.excerpt }}</p>
-              <p class="meta">{{ a.date }}</p>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <aside class="band__aside">
-        <div class="ad ad--halfpage" role="complementary" aria-label="Advertisement">
-          <span class="ad__label">AD — HALF PAGE 300x600</span>
-        </div>
-      </aside>
-    </section>
-    {% endif %}
-
-    <!-- 8. NEWSLETTER SIGNUP -->
-    {% if h.newsletter.show %}
+  {% elif sec.type == "newsletter" %}
+    <!-- NEWSLETTER SIGN-UP -->
     <section class="newsletter">
       <div class="wrap newsletter__inner">
-        <div class="section__head"><h2 class="section__heading">The weekly briefing</h2></div>
-        <p class="newsletter__lead">One email each Friday: the interview of the week, and the three business stories that will matter on Monday.</p>
-        <form class="newsletter__form" action="#" method="post" onsubmit="return false;">
-          <label class="visually-hidden" for="email">Email address</label>
-          <input type="email" id="email" name="email" placeholder="you@company.com" required />
-          <button type="submit">Subscribe</button>
-        </form>
+        <div class="section__head"><h2 class="section__heading">Sharpen your game</h2></div>
+        <p class="newsletter__lead">Subscribe to our newsletter for the latest interviews, insights and industry opinions delivered straight to your inbox.</p>
+        {{ subscribeForm(cms.site, "home") }}
       </div>
     </section>
-    {% endif %}
+  {% endif %}
+
+{% endfor %}
